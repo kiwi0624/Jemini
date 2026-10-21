@@ -27,19 +27,13 @@ export const PLACEHOLDERS = {
   dogs: {
     chihuahua: { letter: "A", symbol: "🐶", alt: "👑", name: "吉娃娃", color: "#FF8FAB" },
     shiba:     { letter: "B", symbol: "🦊", alt: "🧣", name: "柴犬", color: "#7AC74F" },
-    poodle:    { letter: "C", symbol: "🐩", alt: "☁️", name: "貴賓", color: "#FFF9ED" },
-    corgi:     { letter: "D", symbol: "🐕‍🦺", alt: "🦌", name: "柯基", color: "#E6A532" },
+    poodle:    { letter: "C", symbol: "🐩", alt: "☁", name: "貴賓", color: "#FFF9ED" },
+    corgi:     { letter: "D", symbol: "🐕🦺", alt: "🦌", name: "柯基", color: "#E6A532" },
     mix:       { letter: "E", symbol: "🐾", alt: "🎁", name: "米克斯", color: "#8ECAE6" },
   },
   accessories: {
-    santa_hat: { letter: "F", symbol: "🎅", alt: "🎄", name: "聖誕帽", code: "santa_hat", color: "#A63A3A", file: "santa_hat.png", desc: "紅色聖誕帽" },
-    reindeer:  { letter: "G", symbol: "🦌", alt: "🫎", name: "鹿角", code: "reindeer", color: "#8B5E3C", file: "reindeer.png", desc: "麋鹿角髮箍" },
-    scarf:     { letter: "H", symbol: "🧣", alt: "🧤", name: "圍巾", code: "scarf", color: "#7AC74F", file: "scarf.png", desc: "綠色毛線圍巾" },
-    bow:       { letter: "I", symbol: "🎀", alt: "🎀", name: "蝴蝶結", code: "bow", color: "#FF8FAB", file: "bow.png", desc: "粉色蝴蝶結" },
-    bell:      { letter: "J", symbol: "🔔", alt: "🔔", name: "鈴鐺", code: "bell", color: "#E6A532", file: "bell.png", desc: "金色鈴鐺" },
-    snow:      { letter: "K", symbol: "❄️", alt: "❅", name: "雪花", code: "snow", color: "#B8E6FE", file: "snow.png", desc: "雪花貼紙" },
-    gift:      { letter: "L", symbol: "🎁", alt: "🎀", name: "禮物", code: "gift", color: "#FF8FAB", file: "gift.png", desc: "禮物盒" },
-    sock:      { letter: "M", symbol: "🧦", alt: "🧦", name: "聖誕襪", code: "sock", color: "#A63A3A", file: "sock.png", desc: "聖誕襪" },
+    santa_hat: { letter: "F", name: "聖誕帽", code: "santa_hat", color: "#A63A3A", file: "santa_hat.png", desc: "紅色聖誕帽" },
+    
   },
   backgrounds: {
     cream:    { letter: "N", symbol: "📄", name: "奶油雪花", desc: "溫暖紙張", color: "#FFFBF2" },
@@ -50,7 +44,7 @@ export const PLACEHOLDERS = {
   labels: {
     chihuahua: { text: "A", symbol: "👑", name: "小小大魔王", color: "#FF8FAB" },
     shiba: { text: "B", symbol: "🧣", name: "綠圍巾柴", color: "#7AC74F" },
-    poodle: { text: "C", symbol: "☁️", name: "捲毛雪球", color: "#FFF9ED" },
+    poodle: { text: "C", symbol: "☁", name: "捲毛雪球", color: "#FFF9ED" },
     corgi: { text: "D", symbol: "🦌", name: "短腿暖爐", color: "#E6A532" },
     mix: { text: "E", symbol: "🎁", name: "獨一無二", color: "#8ECAE6" },
   }
@@ -69,7 +63,7 @@ export const ACCESSORY_IMAGES = {
   scarf: { id: "scarf", letter: "H", name: "圍巾", code: "scarf", fileName: "scarf.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/scarf.png`, placeholder: PLACEHOLDERS.accessories.scarf, notes: "沒圖顯示 H/🧣", type: "neck" },
   bow: { id: "bow", letter: "I", name: "蝴蝶結", code: "bow", fileName: "bow.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/bow.png`, placeholder: PLACEHOLDERS.accessories.bow, notes: "沒圖顯示 I/🎀", type: "decor" },
   bell: { id: "bell", letter: "J", name: "鈴鐺", code: "bell", fileName: "bell.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/bell.png`, placeholder: PLACEHOLDERS.accessories.bell, notes: "沒圖顯示 J/🔔", type: "decor" },
-  snow: { id: "snow", letter: "K", name: "雪花", code: "snow", fileName: "snow.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/snow.png`, placeholder: PLACEHOLDERS.accessories.snow, notes: "沒圖顯示 K/❄️", type: "effect" },
+  snow: { id: "snow", letter: "K", name: "雪花", code: "snow", fileName: "snow.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/snow.png`, placeholder: PLACEHOLDERS.accessories.snow, notes: "沒圖顯示 K/❄", type: "effect" },
   gift: { id: "gift", letter: "L", name: "禮物", code: "gift", fileName: "gift.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/gift.png`, placeholder: PLACEHOLDERS.accessories.gift, notes: "沒圖顯示 L/🎁", type: "prop" },
   sock: { id: "sock", letter: "M", name: "聖誕襪", code: "sock", fileName: "sock.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/sock.png`, placeholder: PLACEHOLDERS.accessories.sock, notes: "沒圖顯示 M/🧦", type: "prop" },
 };
