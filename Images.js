@@ -32,7 +32,7 @@ export const PLACEHOLDERS = {
     mix:       { letter: "E", symbol: "🐾", alt: "🎁", name: "米克斯", color: "#8ECAE6" },
   },
   accessories: {
-    santa_hat: { letter: "F", symbol: "🎅", alt: "🎄", name: "聖誕帽", code: "santa_hat", color: "#A63A3A", file: "santa_hat.png", desc: "紅色聖誕帽" },
+    santa_hat: { letter: "F", symbol: "🎅", alt: "🎄", name: "聖誕帽", code: "santa_hat", color: "#A63A3A", file: "assets/accessories/santa_hat.png", desc: "紅色聖誕帽" },
     reindeer:  { letter: "G", symbol: "🦌", alt: "🫎", name: "鹿角", code: "reindeer", color: "#8B5E3C", file: "reindeer.png", desc: "麋鹿角髮箍" },
     scarf:     { letter: "H", symbol: "🧣", alt: "🧤", name: "圍巾", code: "scarf", color: "#7AC74F", file: "scarf.png", desc: "綠色毛線圍巾" },
     bow:       { letter: "I", symbol: "🎀", alt: "🎀", name: "蝴蝶結", code: "bow", color: "#FF8FAB", file: "bow.png", desc: "粉色蝴蝶結" },
