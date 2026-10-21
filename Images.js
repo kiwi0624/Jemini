@@ -1,147 +1,160 @@
 /**
  * ===================================================================
- *  images.js - 統一圖檔資源管理中心 v2 (含配件)
+ *  images.js - 統一圖檔資源管理中心 v3 精簡空圖版
  * ===================================================================
- *  更新：配件也要用文字暫時替換 → 已全部加入 ABCD 文字 + 符號系統
- * 
+ *  設計：所有圖片缺失時一律顯示透明空圖，不顯示 ABCD 文字
+ *  只要放進對應 PNG 就會自動載入
+ *
  *  結構：
- *  /assets/
- *    /dogs/        -> A-E (吉娃娃,柴犬,貴賓,柯基,米克斯)
- *    /accessories/ -> F-M (聖誕帽,鹿角,圍巾,蝴蝶結,鈴鐺,雪花,禮物,聖誕襪)
- *    /backgrounds/ -> N-Q (奶油,松綠,格子,深夜藍)
- * 
- *  替換：只要覆蓋對應檔名的 PNG 即可，沒圖時自動顯示 ABCD / Emoji
+ *  /assets/dogs/         -> 狗狗 (5隻)
+ *  /assets/accessories/  -> 配件 (8個)
+ *  /assets/backgrounds/  -> 背景 (4個)
  * ===================================================================
  */
 
+// ==================== [1] 基礎設定 ====================
 export const IMAGE_CONFIG = {
-  USE_LOCAL_FILES: true,
   BASE_PATH: "./assets/dogs",
   ACCESSORY_PATH: "./assets/accessories",
   BACKGROUND_PATH: "./assets/backgrounds",
-  FALLBACK_MODE: "both",
-  ENABLE_ONERROR_FALLBACK: true,
+  ENABLE_ONERROR_FALLBACK: true, // 圖片載入失敗時改顯示空圖
 };
 
-export const PLACEHOLDERS = {
-  dogs: {
-    chihuahua: { letter: "A", symbol: "🐶", alt: "👑", name: "吉娃娃", color: "#FF8FAB" },
-    shiba:     { letter: "B", symbol: "🦊", alt: "🧣", name: "柴犬", color: "#7AC74F" },
-    poodle:    { letter: "C", symbol: "🐩", alt: "☁", name: "貴賓", color: "#FFF9ED" },
-    corgi:     { letter: "D", symbol: "🐕🦺", alt: "🦌", name: "柯基", color: "#E6A532" },
-    mix:       { letter: "E", symbol: "🐾", alt: "🎁", name: "米克斯", color: "#8ECAE6" },
-  },
-  accessories: {
-    santa_hat: { letter: "F", name: "聖誕帽", code: "santa_hat", color: "#A63A3A", file: "santa_hat.png", desc: "紅色聖誕帽" },
-    
-  },
-  backgrounds: {
-    cream:    { letter: "N", symbol: "📄", name: "奶油雪花", desc: "溫暖紙張", color: "#FFFBF2" },
-    forest:   { letter: "O", symbol: "🌲", name: "松綠毛衣", desc: "手織溫感", color: "#2F4A3B" },
-    plaid:    { letter: "P", symbol: "🎀", name: "緋紅格子", desc: "經典節慶", color: "#A63A3A" },
-    midnight: { letter: "Q", symbol: "🌙", name: "深夜藍星", desc: "寧靜雪夜", color: "#1E3329" },
-  },
-  labels: {
-    chihuahua: { text: "A", symbol: "👑", name: "小小大魔王", color: "#FF8FAB" },
-    shiba: { text: "B", symbol: "🧣", name: "綠圍巾柴", color: "#7AC74F" },
-    poodle: { text: "C", symbol: "☁", name: "捲毛雪球", color: "#FFF9ED" },
-    corgi: { text: "D", symbol: "🦌", name: "短腿暖爐", color: "#E6A532" },
-    mix: { text: "E", symbol: "🎁", name: "獨一無二", color: "#8ECAE6" },
-  }
-};
+// 1x1 透明空圖 - 載入失敗或暫無圖片時使用，不顯示任何文字
+export const EMPTY_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
 
-export const BACKGROUND_THEMES = {
-  cream:    { id: "cream", ...PLACEHOLDERS.backgrounds.cream, css: "bg-[#FFFBF2]", fileName: "cream.png", localPath: `${IMAGE_CONFIG.BACKGROUND_PATH}/cream.png` },
-  forest:   { id: "forest", ...PLACEHOLDERS.backgrounds.forest, css: "bg-[#2F4A3B]", fileName: "forest.png", localPath: `${IMAGE_CONFIG.BACKGROUND_PATH}/forest.png` },
-  plaid:    { id: "plaid", ...PLACEHOLDERS.backgrounds.plaid, css: "bg-[#A63A3A]", fileName: "plaid.png", localPath: `${IMAGE_CONFIG.BACKGROUND_PATH}/plaid.png` },
-  midnight: { id: "midnight", ...PLACEHOLDERS.backgrounds.midnight, css: "bg-[#1E3329]", fileName: "midnight.png", localPath: `${IMAGE_CONFIG.BACKGROUND_PATH}/midnight.png` },
-};
-
-export const ACCESSORY_IMAGES = {
-  santa_hat: { id: "santa_hat", letter: "F", name: "聖誕帽", code: "santa_hat", fileName: "santa_hat.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/santa_hat.png`, placeholder: PLACEHOLDERS.accessories.santa_hat, notes: "200x200 透明背景，沒圖顯示 F/🎅", type: "head" },
-  reindeer: { id: "reindeer", letter: "G", name: "鹿角", code: "reindeer", fileName: "reindeer.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/reindeer.png`, placeholder: PLACEHOLDERS.accessories.reindeer, notes: "沒圖顯示 G/🦌", type: "head" },
-  scarf: { id: "scarf", letter: "H", name: "圍巾", code: "scarf", fileName: "scarf.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/scarf.png`, placeholder: PLACEHOLDERS.accessories.scarf, notes: "沒圖顯示 H/🧣", type: "neck" },
-  bow: { id: "bow", letter: "I", name: "蝴蝶結", code: "bow", fileName: "bow.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/bow.png`, placeholder: PLACEHOLDERS.accessories.bow, notes: "沒圖顯示 I/🎀", type: "decor" },
-  bell: { id: "bell", letter: "J", name: "鈴鐺", code: "bell", fileName: "bell.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/bell.png`, placeholder: PLACEHOLDERS.accessories.bell, notes: "沒圖顯示 J/🔔", type: "decor" },
-  snow: { id: "snow", letter: "K", name: "雪花", code: "snow", fileName: "snow.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/snow.png`, placeholder: PLACEHOLDERS.accessories.snow, notes: "沒圖顯示 K/❄", type: "effect" },
-  gift: { id: "gift", letter: "L", name: "禮物", code: "gift", fileName: "gift.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/gift.png`, placeholder: PLACEHOLDERS.accessories.gift, notes: "沒圖顯示 L/🎁", type: "prop" },
-  sock: { id: "sock", letter: "M", name: "聖誕襪", code: "sock", fileName: "sock.png", localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/sock.png`, placeholder: PLACEHOLDERS.accessories.sock, notes: "沒圖顯示 M/🧦", type: "prop" },
-};
-
-export const ACCESSORY_LIST = Object.values(ACCESSORY_IMAGES);
-export const DECORATIONS = ACCESSORY_LIST.map(a => ({ emoji: a.placeholder.symbol, name: a.name, code: a.code, letter: a.letter, fileName: a.fileName }));
-
+// ==================== [2] 狗狗資料 ====================
+// 替換說明：把 assets/dogs/ 裡放入同名 PNG 即可
+// 例：chihuahua.png -> ./assets/dogs/chihuahua.png
 export const DOG_IMAGES = {
-  chihuahua: { id: "chihuahua", letter: "A", name: "淺色長毛吉娃娃", label: "小小大魔王", sub: "蓬鬆尾巴 · 奶油色", fileName: "chihuahua.png", localPath: `${IMAGE_CONFIG.BASE_PATH}/chihuahua.png`, legacyVar: "pv", placeholder: PLACEHOLDERS.dogs.chihuahua, notes: "600x840 透明PNG" },
-  shiba: { id: "shiba", letter: "B", name: "柴犬", label: "綠圍巾柴", sub: "綠圍巾聖誕帽", fileName: "shiba.png", localPath: `${IMAGE_CONFIG.BASE_PATH}/shiba.png`, legacyVar: "Br", placeholder: PLACEHOLDERS.dogs.shiba, notes: "綠圍巾亮點" },
-  poodle: { id: "poodle", letter: "C", name: "貴賓", label: "捲毛雪球", sub: "捲毛雲朵感", fileName: "poodle.png", localPath: `${IMAGE_CONFIG.BASE_PATH}/poodle.png`, legacyVar: "tr", placeholder: PLACEHOLDERS.dogs.poodle, notes: "捲毛細節多" },
-  corgi: { id: "corgi", letter: "D", name: "柯基", label: "短腿暖爐", sub: "小短腿大笑容", fileName: "corgi.png", localPath: `${IMAGE_CONFIG.BASE_PATH}/corgi.png`, legacyVar: "Mr", placeholder: PLACEHOLDERS.dogs.corgi, notes: "笑容+鹿角" },
-  mix: { id: "mix", letter: "E", name: "米克斯", label: "獨一無二", sub: "最特別的你", fileName: "mix.png", localPath: `${IMAGE_CONFIG.BASE_PATH}/mix.png`, legacyVar: "cr", placeholder: PLACEHOLDERS.dogs.mix, notes: "使用者自訂" },
+  chihuahua: { id: "chihuahua", name: "吉娃娃", fileName: "chihuahua.png", legacy: "pv" },
+  shiba:     { id: "shiba", name: "柴犬", fileName: "shiba.png", legacy: "Br" },
+  poodle:    { id: "poodle", name: "貴賓", fileName: "poodle.png", legacy: "tr" },
+  corgi:     { id: "corgi", name: "柯基", fileName: "corgi.png", legacy: "Mr" },
+  mix:       { id: "mix", name: "米克斯", fileName: "mix.png", legacy: "cr" },
 };
-export const DOG_LIST = Object.values(DOG_IMAGES);
+export const DOG_LIST = Object.values(DOG_IMAGES).map(d => ({
+  ...d,
+  localPath: `${IMAGE_CONFIG.BASE_PATH}/${d.fileName}`
+}));
 
-export function createLetterPlaceholder(letter = "A", symbol = "🐶", bgColor = "#F9F1E6", sizeText = "圖片替換中") {
+// ==================== [3] 配件資料 ====================
+// 替換說明：把 assets/accessories/ 裡放入同名 PNG 即可
+// 規格建議：200x200，透明背景 PNG
+// 例：santa_hat.png -> ./assets/accessories/santa_hat.png
+export const ACCESSORY_IMAGES = {
+  santa_hat: { id: "santa_hat", name: "聖誕帽", fileName: "santa_hat.png", type: "head" },
+  reindeer:  { id: "reindeer",  name: "鹿角",   fileName: "reindeer.png",  type: "head" },
+  scarf:     { id: "scarf",     name: "圍巾",   fileName: "scarf.png",     type: "neck" },
+  bow:       { id: "bow",       name: "蝴蝶結", fileName: "bow.png",       type: "decor" },
+  bell:      { id: "bell",      name: "鈴鐺",   fileName: "bell.png",      type: "decor" },
+  snow:      { id: "snow",      name: "雪花",   fileName: "snow.png",      type: "effect" },
+  gift:      { id: "gift",      name: "禮物",   fileName: "gift.png",      type: "prop" },
+  sock:      { id: "sock",      name: "聖誕襪", fileName: "sock.png",      type: "prop" },
+};
+export const ACCESSORY_LIST = Object.values(ACCESSORY_IMAGES).map(a => ({
+  ...a,
+  localPath: `${IMAGE_CONFIG.ACCESSORY_PATH}/${a.fileName}`
+}));
+
+// ==================== [4] 背景資料 ====================
+// 替換說明：把 assets/backgrounds/ 裡放入同名 PNG 即可
+export const BACKGROUND_THEMES = {
+  cream:    { id: "cream",    name: "奶油雪花", fileName: "cream.png", css: "bg-[#FFFBF2]" },
+  forest:   { id: "forest",   name: "松綠毛衣", fileName: "forest.png", css: "bg-[#2F4A3B]" },
+  plaid:    { id: "plaid",    name: "緋紅格子", fileName: "plaid.png", css: "bg-[#A63A3A]" },
+  midnight: { id: "midnight", name: "深夜藍星", fileName: "midnight.png", css: "bg-[#1E3329]" },
+};
+export const BACKGROUND_LIST = Object.values(BACKGROUND_THEMES).map(b => ({
+  ...b,
+  localPath: `${IMAGE_CONFIG.BACKGROUND_PATH}/${b.fileName}`
+}));
+
+// ==================== [5] 相容舊變數 ====================
+// 舊版 pv/Br/tr/Mr/cr 轉新版 id
+export const LEGACY_MAP = {
+  pv: "chihuahua",
+  Br: "shiba",
+  tr: "poodle",
+  Mr: "corgi",
+  cr: "mix"
+};
+
+// ==================== [6] 核心函式 ====================
+
+// [6-1] 產生空圖 (透明圖，用於佔位)
+export function createEmptyPlaceholder(w = 1, h = 1) {
   if (typeof document !== "undefined") {
     const canvas = document.createElement("canvas");
-    canvas.width = 600; canvas.height = 840;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, 600, 840);
-    ctx.fillStyle = "#2F4A3B";
-    ctx.font = "bold 200px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(letter, 300, 340);
-    ctx.font = "120px sans-serif"; ctx.fillText(symbol, 300, 540);
-    ctx.font = "22px sans-serif"; ctx.fillStyle = "rgba(47,74,59,0.6)";
-    ctx.fillText(sizeText, 300, 700);
-    return canvas.toDataURL("image/png");
+    canvas.width = w;
+    canvas.height = h;
+    return canvas.toDataURL("image/png"); // 全透明
   }
-  return `placeholder:${letter}:${symbol}`;
+  return EMPTY_IMAGE;
 }
 
-export function createAccessoryPlaceholder(letter = "F", symbol = "🎅", bgColor = "#FFF9ED") {
-  if (typeof document !== "undefined") {
-    const canvas = document.createElement("canvas");
-    canvas.width = 200; canvas.height = 200;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, 200, 200);
-    ctx.fillStyle = "#2F4A3B";
-    ctx.font = "bold 60px sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(letter, 100, 70);
-    ctx.font = "56px sans-serif"; ctx.fillText(symbol, 100, 140);
-    return canvas.toDataURL("image/png");
-  }
-  return `accessory:${letter}:${symbol}`;
+// [6-2] 取得狗狗圖片路徑
+export function getDogImageSrc(dogId) {
+  const dog = DOG_LIST.find(d => d.id === dogId);
+  return dog ? dog.localPath : EMPTY_IMAGE;
 }
 
-export function getDogImageSrc(dogId) { return DOG_IMAGES[dogId]?.localPath || createLetterPlaceholder("?", "❓"); }
-export function getAccessorySrc(id) { return ACCESSORY_IMAGES[id]?.localPath || createAccessoryPlaceholder("?", "❓"); }
-export function getDogById(id) { return DOG_IMAGES[id] || null; }
-export function getAccessoryById(id) { return ACCESSORY_IMAGES[id] || null; }
+// [6-3] 取得配件圖片路徑
+export function getAccessorySrc(accessoryId) {
+  const acc = ACCESSORY_LIST.find(a => a.id === accessoryId);
+  return acc ? acc.localPath : EMPTY_IMAGE;
+}
 
-export function handleImageError(imgElement, id) {
+// [6-4] 取得背景圖片路徑
+export function getBackgroundSrc(bgId) {
+  const bg = BACKGROUND_LIST.find(b => b.id === bgId);
+  return bg ? bg.localPath : EMPTY_IMAGE;
+}
+
+// [6-5] 依 ID 取得資料物件
+export function getDogById(id) {
+  return DOG_LIST.find(d => d.id === id) || null;
+}
+export function getAccessoryById(id) {
+  return ACCESSORY_LIST.find(a => a.id === id) || null;
+}
+export function getBackgroundById(id) {
+  return BACKGROUND_LIST.find(b => b.id === id) || null;
+}
+
+// [6-6] 圖片載入失敗處理 - 一律改為空圖，不顯示文字
+export function handleImageError(imgElement) {
   if (!IMAGE_CONFIG.ENABLE_ONERROR_FALLBACK) return;
-  const target = DOG_IMAGES[id] || ACCESSORY_IMAGES[id];
-  if (!target) return;
-  const ph = target.placeholder;
-  if (target.letter && target.letter >= "F") {
-    imgElement.src = createAccessoryPlaceholder(ph.letter || ph.text || "?", ph.symbol, ph.color);
-  } else {
-    imgElement.src = createLetterPlaceholder(ph.letter || ph.text || "?", ph.symbol, ph.color);
-  }
+  if (imgElement.dataset.fallback === "true") return; // 避免無限迴圈
+  imgElement.src = EMPTY_IMAGE;
   imgElement.dataset.fallback = "true";
-  imgElement.style.border = "2px dashed rgba(47,74,59,0.2)";
+  imgElement.alt = "";
 }
 
-export function handleAccessoryError(imgElement, accessoryId) { handleImageError(imgElement, accessoryId); }
-export function enablePlaceholderMode() { IMAGE_CONFIG.USE_LOCAL_FILES = false; IMAGE_CONFIG.FALLBACK_MODE = "both"; }
-export function enableLocalMode() { IMAGE_CONFIG.USE_LOCAL_FILES = true; }
+export function handleAccessoryError(imgElement) {
+  handleImageError(imgElement);
+}
 
-export const LEGACY_MAP = { pv: "chihuahua", Br: "shiba", tr: "poodle", Mr: "corgi", cr: "mix" };
+// [6-7] 模式切換 (保留介面，實際都使用空圖模式)
+export function enablePlaceholderMode() {
+  // 空圖模式已是預設，無需切換
+}
+export function enableLocalMode() {
+  IMAGE_CONFIG.ENABLE_ONERROR_FALLBACK = true;
+}
 
+// ==================== [7] 全域掛載 (給非模組的舊 HTML 使用) ====================
 if (typeof window !== "undefined") {
+  window.IMAGE_CONFIG = IMAGE_CONFIG;
+  window.EMPTY_IMAGE = EMPTY_IMAGE;
   window.DOG_IMAGES = DOG_IMAGES;
   window.DOG_LIST = DOG_LIST;
   window.ACCESSORY_IMAGES = ACCESSORY_IMAGES;
   window.ACCESSORY_LIST = ACCESSORY_LIST;
-  window.IMAGE_CONFIG = IMAGE_CONFIG;
-  window.PLACEHOLDERS = PLACEHOLDERS;
+  window.BACKGROUND_THEMES = BACKGROUND_THEMES;
+  window.BACKGROUND_LIST = BACKGROUND_LIST;
+  window.LEGACY_MAP = LEGACY_MAP;
+  window.getDogImageSrc = getDogImageSrc;
+  window.getAccessorySrc = getAccessorySrc;
+  window.handleImageError = handleImageError;
 }
