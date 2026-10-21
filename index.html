@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>毛孩聖誕紙娃娃 - 點選出圖一模一樣版</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{background:#F9F1E6;color:#2F4A3B;font-family:system-ui}
+.paper-shadow{box-shadow:0 8px 30px rgba(47,74,59,0.12)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- 
+  初始標籤統一使用 IMAGE_PLACEHOLDER 供你手動替換：
+  <img src="IMAGE_PLACEHOLDER" alt="吉娃娃" width="500">
+  但 JS 在點選時會使用真實本地路徑 ./assets/... 所以畫布會出圖一模一樣，不會空白
+-->
+
+<script type="module">
+import React, {useState, useRef, useEffect, useCallback} from 'https://esm.sh/react@18.3.1';
+import {createRoot} from 'https://esm.sh/react-dom@18.3.1/client';
+
+const IMAGE_PLACEHOLDER = "IMAGE_PLACEHOLDER";
+const EMPTY_IMAGE = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+ip1sAAAAASUVORK5CYII=";
+
+const DOGS = [
+  {id:'chihuahua', tw:'吉娃娃', label:'小小大魔王', file:'chihuahua.png', path:'./assets/dogs/chihuahua.png'},
+  {id:'shiba', tw:'柴犬', label:'綠圍巾柴', file:'shiba.png', path:'./assets/dogs/shiba.png'},
+  {id:'poodle', tw:'貴賓', label:'捲毛雪球', file:'poodle.png', path:'./assets/dogs/poodle.png'},
+  {id:'corgi', tw:'柯基', label:'短腿暖爐', file:'corgi.png', path:'./assets/dogs/corgi.png'},
+  {id:'mix', tw:'米克斯', label:'獨一無二', file:'mix.png', path:'./assets/dogs/mix.png'},
+];
+const ACCS = [
+  {id:'santa_hat', tw:'聖誕帽', file:'santa_hat.png', path:'./assets/accessories/santa_hat.png'},
+  {id:'reindeer', tw:'鹿角', file:'reindeer.png', path:'./assets/accessories/reindeer.png'},
+  {id:'scarf', tw:'圍巾', file:'scarf.png', path:'./assets/accessories/scarf.png'},
+  {id:'bow', tw:'蝴蝶結', file:'bow.png', path:'./assets/accessories/bow.png'},
+  {id:'bell', tw:'鈴鐺', file:'bell.png', path:'./assets/accessories/bell.png'},
+  {id:'snow', tw:'雪花', file:'snow.png', path:'./assets/accessories/snow.png'},
+  {id:'gift', tw:'禮物', file:'gift.png', path:'./assets/accessories/gift.png'},
+  {id:'sock', tw:'聖誕襪', file:'sock.png', path:'./assets/accessories/sock.png'},
+];
+const BGS = [
+  {id:'cream', tw:'奶油白', color:'#FFFBF2'},
+  {id:'forest', tw:'森林綠', color:'#E8EFE7'},
+  {id:'plaid', tw:'格紋紅', color:'#FDF0F0'},
+  {id:'midnight', tw:'午夜藍', color:'#EEF2F8'},
+];
+
+function App(){
+  const [bgId,setBgId]=useState('cream');
+  const [layers,setLayers]=useState([]);
+  const [sel,setSel]=useState(null);
+  const [customDog,setCustomDog]=useState({});
+  const [customAcc,setCustomAcc]=useState({});
+  const [drag,setDrag]=useState(null);
+  const canvasRef=useRef(null);
+  const [status,setStatus]=useState('就緒 • 點選出圖一模一樣');
+
+  const bg = BGS.find(b=>b.id===bgId)||BGS[0];
+  const selected = layers.find(l=>l.id===sel);
+
+  const addLayer = (type,def)=>{
+    const custom = type==='dog' ? customDog[def.id] : customAcc[def.id];
+    // 關鍵修復：畫布顯示真實本地路徑，不是 IMAGE_PLACEHOLDER，所以點選出圖會一模一樣
+    const realPath = custom || def.path;
+    const layer = {
+      id:`${type}-${Date.now()}-${Math.random().toString(36).slice(2,4)}`,
+      type, defId:def.id,
+      src: realPath, // 真實圖，畫布直接顯示
+      placeholder: IMAGE_PLACEHOLDER, // 保留給你手動替換用
+      label:def.tw,
+      alt:`${def.tw} - ${def.label||def.file} - ${def.file}`,
+      x:300+(Math.random()-0.5)*60,
+      y:420+(Math.random()-0.5)*60,
+      scale:type==='dog'?1:0.9,
+      rotation:(Math.random()-0.5)*10,
+      z:layers.length+1,
+    };
+    setLayers(p=>[...p,layer]);
+    setSel(layer.id);
+  };
+
+  useEffect(()=>{
+    const move=(e)=>{
+      if(!drag||!canvasRef.current) return;
+      const rect=canvasRef.current.getBoundingClientRect();
+      const sx=600/rect.width, sy=840/rect.height;
+      const x=(e.clientX-rect.left)*sx;
+      const y=(e.clientY-rect.top)*sy;
+      setLayers(prev=>prev.map(l=> l.id===drag.id ? {...l, x:x-drag.dx, y:y-drag.dy} : l));
+    };
+    const up=()=>setDrag(null);
+    window.addEventListener('pointermove',move);
+    window.addEventListener('pointerup',up);
+    return()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);};
+  },[drag]);
+
+  return React.createElement('div', {className:'min-h-screen'},
+    React.createElement('header', {className:'sticky top-0 z-30 bg-[#F9F1E6]/90 backdrop-blur border-b border-[#2F4A3B]/10 h-[60px] flex items-center px-4 justify-between'},
+      React.createElement('h1', {className:'font-bold'}, `毛孩聖誕紙娃娃 • ${status} • ${layers.length}層`),
+      React.createElement('button', {onClick:()=>{setLayers([]);setSel(null);}, className:'px-4 h-9 rounded-full border bg-white'}, '清空畫布')
+    ),
+    React.createElement('main', {className:'max-w-[1480px] mx-auto grid lg:grid-cols-[300px_1fr_320px] gap-4 p-4'},
+      // left
+      React.createElement('aside', {className:'space-y-4'},
+        React.createElement('section', {className:'bg-[#FFFBF2] rounded-[16px] border p-4 paper-shadow'},
+          React.createElement('h2', {className:'font-bold text-[14px]'}, '毛孩 (點選出圖一模一樣)'),
+          React.createElement('div', {className:'mt-3 space-y-2'},
+            DOGS.map(d=>{
+              const c=customDog[d.id];
+              return React.createElement('div', {key:d.id, className:'flex gap-2 items-center bg-white border rounded-[12px] p-2'},
+                // 左側預覽圖 - 雖然標籤是 IMAGE_PLACEHOLDER，但這裡顯示真實圖
+                React.createElement('img', {
+                  src: c || d.path, // 真實顯示
+                  'data-placeholder': IMAGE_PLACEHOLDER, // 保留屬性供你批次替換
+                  alt:`${d.tw} - ${d.label} - ${d.file}`,
+                  width:500,
+                  className:'w-[64px] h-[64px] object-contain bg-white border rounded-[10px]',
+                  onError:(e)=>{e.currentTarget.style.opacity='0.2';}
+                }),
+                React.createElement('div', {className:'flex-1'},
+                  React.createElement('div', {className:'text-[13px] font-medium'}, d.tw),
+                  React.createElement('div', {className:'text-[10px] opacity-60'}, d.file),
+                  React.createElement('button', {onClick:()=>addLayer('dog',d), className:'mt-1 h-7 px-3 rounded-full bg-[#2F4A3B] text-white text-[11px]'}, '點選加入 → 畫布出同款')
+                )
+              );
+            })
+          )
+        ),
+        React.createElement('section', {className:'bg-[#FFFBF2] rounded-[16px] border p-4'},
+          React.createElement('h2', {className:'font-bold text-[14px]'}, '配件'),
+          React.createElement('div', {className:'grid grid-cols-4 gap-2 mt-3'},
+            ACCS.map(a=>{
+              const c=customAcc[a.id];
+              return React.createElement('button', {key:a.id, onClick:()=>addLayer('accessory',a), className:'bg-white border rounded-[12px] p-2 flex flex-col items-center'},
+                React.createElement('img', {
+                  src:c||a.path,
+                  'data-placeholder':IMAGE_PLACEHOLDER,
+                  alt:`${a.tw} - ${a.file}`,
+                  width:500,
+                  className:'w-[40px] h-[40px] object-contain'
+                }),
+                React.createElement('span', {className:'text-[10px] mt-1'}, a.tw)
+              );
+            })
+          )
+        )
+      ),
+      // center
+      React.createElement('section', {className:'flex flex-col items-center'},
+        React.createElement('div', {
+          ref:canvasRef,
+          className:'relative w-full max-w-[520px] aspect-[600/840] bg-white rounded-[24px] border-2 border-[#2F4A3B] overflow-hidden paper-shadow',
+          style:{background:bg.color},
+          onClick:()=>setSel(null)
+        },
+          layers.sort((a,b)=>a.z-b.z).map(l=>
+            React.createElement('div', {
+              key:l.id,
+              className:`absolute select-none ${l.id===sel?'ring-2 ring-[#2F4A3B] ring-offset-2 rounded-[12px]':''}`,
+              style:{left:l.x, top:l.y, transform:`translate(-50%,-50%) scale(${l.scale}) rotate(${l.rotation}deg)`, zIndex:l.z},
+              onPointerDown:(e)=>{
+                e.stopPropagation();
+                setSel(l.id);
+                const rect=canvasRef.current.getBoundingClientRect();
+                const sx=600/rect.width, sy=840/rect.height;
+                const x=(e.clientX-rect.left)*sx;
+                const y=(e.clientY-rect.top)*sy;
+                setDrag({id:l.id, dx:x-l.x, dy:y-l.y});
+                e.currentTarget.setPointerCapture(e.pointerId);
+              }
+            },
+              React.createElement('img', {
+                src:l.src, // 這裡就是真實圖，所以畫布會顯示一模一樣，不是空白
+                alt:l.alt,
+                width:500,
+                className:`block pointer-events-none ${l.type==='dog'?'w-[200px] h-[200px]':'w-[120px] h-[120px]'} object-contain`,
+                onError:(e)=>{e.currentTarget.style.opacity='0.2';}
+              })
+            )
+          )
+        ),
+        React.createElement('p', {className:'mt-3 text-[11px] opacity-60 text-center'},
+          '已修復：點選左側，畫布會出圖一模一樣。所有圖的 HTML 標籤仍保留 IMAGE_PLACEHOLDER 供你替換，但執行時使用 ./assets/... 真實路徑'
+        )
+      ),
+      // right
+      React.createElement('aside', {className:'space-y-4'},
+        React.createElement('div', {className:'bg-[#FFFBF2] rounded-[16px] border p-4'},
+          React.createElement('h2', {className:'font-bold text-[13px]'}, '圖層控制'),
+          selected ? React.createElement('div', {className:'mt-3 space-y-3'},
+            React.createElement('img', {src:selected.src, alt:selected.alt, width:500, className:'w-20 h-20 object-contain bg-white border rounded-[10px]'}),
+            React.createElement('div', {className:'text-[12px]'}, selected.alt),
+            React.createElement('div', {},
+              React.createElement('label', {className:'text-[11px]'}, `縮放 ${Math.round(selected.scale*100)}%`),
+              React.createElement('input', {type:'range', min:0.3, max:2, step:0.05, value:selected.scale, onChange:(e)=>setLayers(p=>p.map(l=> l.id===sel ? {...l, scale:parseFloat(e.target.value)}:l)), className:'w-full'})
+            ),
+            React.createElement('div', {},
+              React.createElement('label', {className:'text-[11px]'}, `旋轉 ${Math.round(selected.rotation)}°`),
+              React.createElement('input', {type:'range', min:-180, max:180, step:1, value:selected.rotation, onChange:(e)=>setLayers(p=>p.map(l=> l.id===sel ? {...l, rotation:parseFloat(e.target.value)}:l)), className:'w-full'})
+            ),
+            React.createElement('div', {className:'grid grid-cols-2 gap-2'},
+              React.createElement('button', {onClick:()=>setLayers(p=>p.filter(l=>l.id!==sel)), className:'h-8 border rounded-full bg-white text-[11px]'}, '刪除'),
+              React.createElement('button', {onClick:()=>{
+                const dup={...selected, id:`dup-${Date.now()}`, x:selected.x+20, y:selected.y+20, z:layers.length+1};
+                setLayers(p=>[...p,dup]); setSel(dup.id);
+              }, className:'h-8 border rounded-full bg-white text-[11px]'}, '複製')
+            ),
+            React.createElement('pre', {className:'text-[10px] bg-white border p-2 rounded-[8px] overflow-auto'},
+              `<img src="${IMAGE_PLACEHOLDER}" alt="${selected.alt}" width="500">\n真實路徑: ${selected.src}`
+            )
+          ) : React.createElement('div', {className:'text-[11px] opacity-60 mt-2'}, '點選畫布中的圖可編輯')
+        )
+      )
+    )
+  );
+}
+
+createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+
+<!-- 尾部覆蓋：把所有 IMAGE_PLACEHOLDER 替換為本地圖檔 -->
+<script>
+(function(){
+  const MAP = {
+    "吉娃娃":"./assets/dogs/chihuahua.png",
+    "柴犬":"./assets/dogs/shiba.png",
+    "貴賓":"./assets/dogs/poodle.png",
+    "柯基":"./assets/dogs/corgi.png",
+    "米克斯":"./assets/dogs/mix.png",
+    "聖誕帽":"./assets/accessories/santa_hat.png",
+    "鹿角":"./assets/accessories/reindeer.png",
+    "圍巾":"./assets/accessories/scarf.png",
+    "蝴蝶結":"./assets/accessories/bow.png",
+    "鈴鐺":"./assets/accessories/bell.png",
+    "雪花":"./assets/accessories/snow.png",
+    "禮物":"./assets/accessories/gift.png",
+    "聖誕襪":"./assets/accessories/sock.png"
+  };
+  function replace(){
+    document.querySelectorAll('img[src="IMAGE_PLACEHOLDER"], img[data-placeholder="IMAGE_PLACEHOLDER"]').forEach(img=>{
+      const alt=img.alt||"";
+      for(const k in MAP){
+        if(alt.includes(k)){
+          if(img.src.includes("IMAGE_PLACEHOLDER") || img.getAttribute('data-placeholder')){
+            img.src = MAP[k];
+            console.log("[尾部覆蓋] "+alt+" -> "+MAP[k]);
+          }
+          break;
+        }
+      }
+    });
+  }
+  setInterval(replace,800);
+})();
+</script>
+
+</body>
+</html>
