@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>毛孩聖誕紙娃娃佈置台</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+body{margin:0;background:#F9F1E6;color:#2F4A3B;font-family:-apple-system,BlinkMacSystemFont,"PingFang TC",system-ui,sans-serif}
+.paper-shadow{box-shadow:0 8px 30px rgba(47,74,59,0.12),0 2px 8px rgba(47,74,59,0.08)}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="module">
+import React, {useState, useRef, useEffect, useCallback} from 'https://esm.sh/react@18.3.1';
+import {createRoot} from 'https://esm.sh/react-dom@18.3.1/client';
+
+// ===== GitHub Pages 精簡版：單一真相來源，無重複 =====
+// index.html 在外層，圖片在 assets/dogs/ ，GitHub Pages 用相對路徑最穩
+const BASE = 'assets/'; 
+const DOGS = [
+  {id:'chihuahua', tw:'吉娃娃', label:'小小大魔王', file:`${BASE}dogs/IMG_0875.png`},
+  {id:'shiba',     tw:'博美', label:'綠圍巾柴', file:`${BASE}dogs/IMG_0881.png`},
+  {id:'poodle',    tw:'貴賓', label:'捲毛雪球', file:`${BASE}dogs/IMG_0879.png`},
+  {id:'corgi',     tw:'柯基', label:'短腿暖爐', file:`${BASE}dogs/IMG_0880.png`},
+  {id:'mix',       tw:'米克斯', label:'獨一無二', file:`${BASE}dogs/IMG_0876.png`},
+];
+const ACCS = [
+  {id:'santa_hat', tw:'聖誕帽', file:`${BASE}accessories/santa_hat.png`},
+  {id:'reindeer',  tw:'鹿角', file:`${BASE}accessories/reindeer.png`},
+  {id:'scarf',     tw:'圍巾', file:`${BASE}accessories/scarf.png`},
+  {id:'bow',       tw:'蝴蝶結', file:`${BASE}accessories/bow.png`},
+  {id:'bell',      tw:'鈴鐺', file:`${BASE}accessories/bell.png`},
+  {id:'snow',      tw:'雪花', file:`${BASE}accessories/snow.png`},
+  {id:'gift',      tw:'禮物', file:`${BASE}accessories/gift.png`},
+  {id:'sock',      tw:'聖誕襪', file:`${BASE}accessories/sock.png`},
+];
+const BGS = [
+  {id:'cream', tw:'奶油白', color:'#FFFBF2'},
+  {id:'forest', tw:'森林綠', color:'#E8EFE7'},
+  {id:'plaid', tw:'格紋紅', color:'#FDF0F0'},
+  {id:'midnight', tw:'午夜藍', color:'#EEF2F8'},
+];
+
+const fallback = (t) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><rect width='100%' height='100%' fill='#FFFBF2'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' font-size='16' fill='#2F4A3B'>${t}</text></svg>`)}`;
+
+function App(){
+  const [bgId,setBgId] = useState('cream');
+  const [layers,setLayers] = useState([]);
+  const [selectedId,setSelectedId] = useState(null);
+  const [drag,setDrag] = useState(null);
+  const canvasRef = useRef(null);
+  const bg = BGS.find(b=>b.id===bgId);
+
+  const add = useCallback((type,def)=>{
+    setLayers(p=>[...p,{
+      id:`${type}-${Date.now()}`,
+      type, defId:def.id, label:def.tw,
+      src: def.file, // 直接用本地真實路徑，GitHub Pages 抓得到
+      x:300+Math.random()*60-30, y:400+Math.random()*60-30,
+      scale: type==='dog'?1:0.8, rot:(Math.random()-0.5)*10, z:p.length
+    }]);
+  },[]);
+
+  useEffect(()=>{
+    const move = e=>{
+      if(!drag||!canvasRef.current) return;
+      const r=canvasRef.current.getBoundingClientRect();
+      const x=(e.clientX-r.left)*(600/r.width), y=(e.clientY-r.top)*(840/r.height);
+      setLayers(l=>l.map(v=>v.id===drag.id?{...v,x:x-drag.dx,y:y-drag.dy}:v));
+    };
+    const up=()=>setDrag(null);
+    window.addEventListener('pointermove',move);
+    window.addEventListener('pointerup',up);
+    return ()=>{window.removeEventListener('pointermove',move);window.removeEventListener('pointerup',up);};
+  },[drag]);
+
+  const sel = layers.find(l=>l.id===selectedId);
+
+  const exportPNG = async()=>{
+    const c=document.createElement('canvas'); c.width=1200; c.height=1680;
+    const ctx=c.getContext('2d'); ctx.fillStyle=bg.color; ctx.fillRect(0,0,1200,1680);
+    for(const l of [...layers].sort((a,b)=>a.z-b.z)){
+      ctx.save(); ctx.translate(l.x*2,l.y*2); ctx.rotate(l.rot*Math.PI/180); ctx.scale(l.scale*2,l.scale*2);
+      try{
+        const img=new Image(); img.crossOrigin='anonymous';
+        await new Promise(res=>{img.onload=res; img.onerror=res; img.src=l.src; setTimeout(res,800);});
+        if(img.naturalWidth) ctx.drawImage(img,-(l.type==='dog'?110:70),-(l.type==='dog'?110:70), l.type==='dog'?220:140, l.type==='dog'?220:140);
+      }catch{}
+      ctx.restore();
+    }
+    const a=document.createElement('a'); a.href=c.toDataURL('image/png'); a.download='christmas-dog.png'; a.click();
+  };
+
+  return React.createElement('div',{},
+    React.createElement('header',{className:'sticky top-0 z-20 backdrop-blur border-b border-[#2F4A3B]/10 bg-[#F9F1E6]/80'},
+      React.createElement('div',{className:'max-w-[1480px] mx-auto h-[60px] px-4 flex items-center justify-between'},
+        React.createElement('div',{className:'flex gap-2 items-center'},
+          React.createElement('div',{className:'w-8 h-8 rounded-full bg-[#2F4A3B] text-white grid place-items-center'},'紙'),
+          React.createElement('b',{className:'text-[16px]'},'毛孩聖誕紙娃娃佈置台 • GitHub Pages 精簡版')
+        ),
+        React.createElement('div',{className:'flex gap-2'},
+          React.createElement('button',{onClick:()=>setLayers([]), className:'h-8 px-3 rounded-full border bg-white text-[12px]'},'清空'),
+          React.createElement('button',{onClick:exportPNG, className:'h-8 px-4 rounded-full bg-[#2F4A3B] text-white text-[12px]'},'匯出 PNG')
+        )
+      )
+    ),
+    React.createElement('main',{className:'max-w-[1480px] mx-auto p-4 grid grid-cols-1 lg:grid-cols-[300px_1fr_300px] gap-4'},
+      React.createElement('aside',{className:'space-y-4 order-2 lg:order-1'},
+        React.createElement('section',{className:'rounded-[18px] bg-white border paper-shadow p-4'},
+          React.createElement('h2',{className:'text-[13px] font-semibold'},'背景'),
+          React.createElement('div',{className:'grid grid-cols-2 gap-2 mt-2'},
+            BGS.map(b=>React.createElement('button',{key:b.id,onClick:()=>setBgId(b.id),className:`h-[56px] rounded-[12px] border ${bgId===b.id?'border-[#2F4A3B] ring-2 ring-[#2F4A3B]/20':'border-black/10'}`,style:{background:b.color}},React.createElement('span',{className:'text-[11px]'},b.tw)))
+          )
+        ),
+        React.createElement('section',{className:'rounded-[18px] bg-white border paper-shadow p-4'},
+          React.createElement('h2',{className:'text-[13px] font-semibold'},'毛孩'),
+          React.createElement('div',{className:'space-y-2 mt-2'},
+            DOGS.map(d=>React.createElement('div',{key:d.id,className:'flex gap-2 items-center border rounded-[12px] p-2 bg-[#FFFBF2]'},
+              React.createElement('img',{src:d.file,alt:d.tw,width:500,className:'w-[56px] h-[56px] rounded-[10px] bg-white object-contain border',onError:e=>e.currentTarget.src=fallback(d.tw)}),
+              React.createElement('div',{className:'flex-1'},React.createElement('div',{className:'text-[13px] font-medium'},d.tw),React.createElement('div',{className:'text-[11px] opacity-60'},d.label)),
+              React.createElement('button',{onClick:()=>add('dog',d),className:'h-7 px-3 rounded-full bg-[#2F4A3B] text-white text-[11px]'},'加入')
+            ))
+          )
+        ),
+        React.createElement('section',{className:'rounded-[18px] bg-white border paper-shadow p-4'},
+          React.createElement('h2',{className:'text-[13px] font-semibold'},'配件'),
+          React.createElement('div',{className:'grid grid-cols-4 gap-2 mt-2'},
+            ACCS.map(a=>React.createElement('button',{key:a.id,onClick:()=>add('acc',a),className:'aspect-square rounded-[12px] border bg-white flex flex-col items-center justify-center'},
+              React.createElement('img',{src:a.file,alt:a.tw,width:500,className:'w-[36px] h-[36px] object-contain',onError:e=>e.currentTarget.src=fallback(a.tw)}),
+              React.createElement('span',{className:'text-[10px] mt-1'},a.tw)
+            ))
+          )
+        )
+      ),
+      React.createElement('section',{className:'order-1 lg:order-2 flex flex-col items-center'},
+        React.createElement('div',{ref:canvasRef,className:'relative w-full max-w-[540px] aspect-[600/840] rounded-[22px] overflow-hidden border paper-shadow',style:{background:bg.color},onClick:()=>setSelectedId(null)},
+          [...layers].sort((a,b)=>a.z-b.z).map(l=>
+            React.createElement('div',{key:l.id,className:'absolute select-none',style:{left:l.x,top:l.y,transform:`translate(-50%,-50%) scale(${l.scale}) rotate(${l.rot}deg)`,zIndex:l.z},
+              onPointerDown:e=>{e.stopPropagation(); setSelectedId(l.id); const r=canvasRef.current.getBoundingClientRect(); setDrag({id:l.id,dx:(e.clientX-r.left)*(600/r.width)-l.x,dy:(e.clientY-r.top)*(840/r.height)-l.y});}
+            },
+              React.createElement('img',{src:l.src,alt:l.label,width:500,className:`pointer-events-none ${l.type==='dog'?'w-[180px] h-[180px]':'w-[110px] h-[110px]'} object-contain ${selectedId===l.id?'ring-2 ring-[#2F4A3B] rounded-[12px]':''}`,onError:e=>e.currentTarget.src=fallback(l.label)})
+            )
+          )
+        )
+      ),
+      React.createElement('aside',{className:'order-3'},
+        React.createElement('section',{className:'rounded-[18px] bg-white border paper-shadow p-4'},
+          React.createElement('h2',{className:'text-[13px] font-semibold'},'編輯'),
+          sel?React.createElement('div',{className:'space-y-3 mt-2'},
+            React.createElement('div',{className:'text-[12px]'},sel.label),
+            React.createElement('input',{type:'range',min:0.3,max:2,step:0.05,value:sel.scale,onChange:e=>setLayers(p=>p.map(v=>v.id===sel.id?{...v,scale:parseFloat(e.target.value)}:v)),className:'w-full accent-[#2F4A3B]'}),
+            React.createElement('input',{type:'range',min:-180,max:180,step:1,value:sel.rot,onChange:e=>setLayers(p=>p.map(v=>v.id===sel.id?{...v,rot:parseFloat(e.target.value)}:v)),className:'w-full accent-[#2F4A3B]'}),
+            React.createElement('div',{className:'grid grid-cols-2 gap-2'},
+              React.createElement('button',{onClick:()=>setLayers(p=>p.filter(v=>v.id!==sel.id)),className:'h-8 rounded-full border bg-[#C94A3D]/10 text-[#C94A3D] text-[11px]'},'刪除'),
+              React.createElement('button',{onClick:()=>{const d={...sel,id:`${sel.type}-${Date.now()}`,x:sel.x+20,y:sel.y+20,z:layers.length}; setLayers(p=>[...p,d]);},className:'h-8 rounded-full border bg-white text-[11px]'},'複製')
+            )
+          ):React.createElement('div',{className:'text-[11px] opacity-50'},'點選畫布上的圖層編輯')
+        )
+      )
+    )
+  );
+}
+createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>
