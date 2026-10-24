@@ -325,48 +325,6 @@ createRoot(document.getElementById('root')).render(React.createElement(App));
 </script>
 
 <!-- 尾部覆蓋修正版：同時處理 IMAGE_PLACEHOLDER 和 本地路徑備援 -->
-<script>
-(function(){
-  const LOCAL_MAP = {
-    "吉娃娃": "./assets/dogs/IMG_0875.png",
-    "博美": "./assets/dogs/IMG_0881.png",
-    "貴賓": "./assets/dogs/IMG_0879.png",
-    "柯基": "./assets/dogs/IMG_0880.png",
-    "米克斯": "./assets/dogs/IMG_0876.png",
-    "聖誕帽": "./assets/accessories/santa_hat.png",
-    "鹿角": "./assets/accessories/reindeer.png",
-    "圍巾": "./assets/accessories/scarf.png",
-    "蝴蝶結": "./assets/accessories/bow.png",
-    "鈴鐺": "./assets/accessories/bell.png",
-    "雪花": "./assets/accessories/snow.png",
-    "禮物": "./assets/accessories/gift.png",
-    "聖誕襪": "./assets/accessories/sock.png"
-  };
-  const svgFallback = (label) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='400' height='400'><rect width='100%' height='100%' fill='#FFFBF2'/><circle cx='200' cy='150' r='70' fill='#E8EFE7'/><text x='50%' y='260' text-anchor='middle' font-size='22' fill='#2F4A3B'>${label}</text></svg>`)}`;
 
-  function replaceAll(){
-    document.querySelectorAll('img').forEach(img=>{
-      const src = img.getAttribute('src') || '';
-      const alt = img.getAttribute('alt') || '';
-      // 如果是 IMAGE_PLACEHOLDER，根據 alt 替換
-      if(src === 'IMAGE_PLACEHOLDER' || src.includes('IMAGE_PLACEHOLDER')){
-        for(const key in LOCAL_MAP){
-          if(alt.includes(key)){
-            img.src = LOCAL_MAP[key];
-            img.onerror = () => { img.src = svgFallback(key); };
-            break;
-          }
-        }
-      }
-    });
-  }
-
-  const observer = new MutationObserver(replaceAll);
-  observer.observe(document.body, {childList:true, subtree:true});
-  setInterval(replaceAll, 1000);
-  replaceAll();
-  console.log('[修正版] 尾部覆蓋已啟動，支援本地顯示');
-})();
-</script>
 </body>
 </html>
