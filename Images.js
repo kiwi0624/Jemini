@@ -25,11 +25,11 @@ export const EMPTY_IMAGE = "data:image/png;base64,[STRIPPED]";
 
 // ==================== [2] 狗狗 ====================
 export const DOG_IMAGES = {
-  chihuahua: { id: "chihuahua", name: "吉娃娃", fileName: "chihuahua.png", legacy: "pv" },
-  shiba:     { id: "shiba", name: "柴犬", fileName: "shiba.png", legacy: "Br" },
-  poodle:    { id: "poodle", name: "貴賓", fileName: "poodle.png", legacy: "tr" },
-  corgi:     { id: "corgi", name: "柯基", fileName: "corgi.png", legacy: "Mr" },
-  mix:       { id: "mix", name: "米克斯", fileName: "mix.png", legacy: "cr" },
+  chihuahua: { id: "chihuahua", name: "吉娃娃", fileName: "IMG_0875.png", legacy: "pv" },
+  shiba:     { id: "shiba", name: "博美狗", fileName: "IMG_0881.png", legacy: "Br" },
+  poodle:    { id: "poodle", name: "貴賓", fileName: "IMG_0879.png", legacy: "tr" },
+  corgi:     { id: "corgi", name: "柯基", fileName: "IMG_0880.png", legacy: "Mr" },
+  mix:       { id: "mix", name: "米克斯", fileName: "IMG_0876.png", legacy: "cr" },
 };
 
 export const DOG_LIST = Object.values(DOG_IMAGES).map(d => ({
