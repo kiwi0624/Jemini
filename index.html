@@ -54,78 +54,59 @@ CHRISTMAS`),[z,N]=j.useState(!1),R=j.useRef(null),W=j.useRef({id:null,startX:0,s
 <script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script>
 
 
-
 <script>
-// ========== 路徑設定區 - 你只要改這裡 ==========
-// index 在外面，圖在 assets/dogs/ ，GitHub Pages 用這個最穩
-const IMAGE_PATHS = {
-  // 狗狗 5隻 - 你的檔是大寫 .PNG
-  "吉娃娃": "assets/dogs/IMG_0875.PNG",
-  "博美":   "assets/dogs/IMG_0881.PNG",
-  "貴賓":   "assets/dogs/IMG_0879.PNG",
-  "柯基":   "assets/dogs/IMG_0880.PNG",
-  "米克斯": "assets/dogs/IMG_0876.PNG",
-  "chihuahua": "assets/dogs/IMG_0875.PNG",
-  "shiba": "assets/dogs/IMG_0881.PNG",
-  "poodle": "assets/dogs/IMG_0879.PNG",
-  "corgi": "assets/dogs/IMG_0880.PNG",
-  "mix": "assets/dogs/IMG_0876.PNG",
-
-  // 配件 8個
-  "聖誕帽": "assets/accessories/santa_hat.png",
-  "鹿角": "assets/accessories/reindeer.png",
-  "圍巾": "assets/accessories/scarf.png",
-  "蝴蝶結": "assets/accessories/bow.png",
-  "鈴鐺": "assets/accessories/bell.png",
-  "雪花": "assets/accessories/snow.png",
-  "禮物": "assets/accessories/gift.png",
-  "聖誕襪": "assets/accessories/sock.png",
-
-  // 背景
-  "奶油白": "assets/backgrounds/cream.png",
-  "森林綠": "assets/backgrounds/forest.png",
-  "格紋紅": "assets/backgrounds/plaid.png",
-  "午夜藍": "assets/backgrounds/midnight.png",
-};
-
-// ========== 自動替換邏輯 - 不用改 ==========
-(function(){
-  function replaceAll(){
-    document.querySelectorAll('img').forEach(img=>{
-      const alt = (img.alt||'') + (img.src||'');
-      const srcAttr = img.getAttribute('src')||'';
-      // 如果是 IMAGE_PLACEHOLDER 或路徑錯的，就替換
-      if(srcAttr.includes('IMAGE_PLACEHOLDER') || img.naturalWidth===0){
-        for(const key in IMAGE_PATHS){
-          if(alt.includes(key)){
-            img.src = IMAGE_PATHS[key];
-            break;
-          }
-        }
-      }
-      // 就算已經有 src，也檢查 alt 關鍵字，強制覆蓋成你設定的路徑
-      for(const key in IMAGE_PATHS){
-        if(alt.includes(key) && !img.src.includes(IMAGE_PATHS[key])){
-          // 如果 alt 有對到，就用你設定的路徑
-          if(img.src.includes('assets/') || srcAttr.includes('IMAGE_PLACEHOLDER')){
-             img.src = IMAGE_PATHS[key];
-          }
-        }
-      }
-    });
-  }
-  // React 畫完再跑
-  let count=0;
-  const timer=setInterval(()=>{ replaceAll(); count++; if(count>20) clearInterval(timer); }, 500);
-  // 監聽新加入的圖
-  const obs=new MutationObserver(replaceAll);
-  obs.observe(document.body,{childList:true, subtree:true});
-  window.replaceAllImages = replaceAll;
-})();
+// === 圖片資源管理區 - 方便後續覆蓋 ===
+// 狗狗區
+// const dogs = [
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG",
+  "assets/dogs/IMG_0881.PNG"
+]
+// 配件區
+// const accessories = [
+  "assets/accessories/acc1.png",
+  "assets/accessories/acc2.png",
+  "assets/accessories/acc3.png",
+  "assets/accessories/acc4.png"
+]
+// 背景區
+// const backgrounds = [
+  "assets/backgrounds/bg1.jpg",
+  "assets/backgrounds/bg2.jpg",
+  "assets/backgrounds/bg3.jpg"
+]
+const ASSETS = {
+  dogs: [
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG",
+    "assets/dogs/IMG_0881.PNG"
+],
+  accessories: [
+    "assets/accessories/acc1.png",
+    "assets/accessories/acc2.png",
+    "assets/accessories/acc3.png",
+    "assets/accessories/acc4.png"
+],
+  backgrounds: [
+    "assets/backgrounds/bg1.jpg",
+    "assets/backgrounds/bg2.jpg",
+    "assets/backgrounds/bg3.jpg"
+]
+}
 </script>
+<!-- 畫布、圖層、拖拉使用 Pointer Events + setPointerCapture -->
+<!-- 圖片 touch-action:none 防止網頁移動，畫布空白 touch-action:auto 允許捲動 -->
 
-
-  
 </body>
 
 
