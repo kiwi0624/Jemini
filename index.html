@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>聖誕狗狗卡片 V41 - 預覽收進螢幕版</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@400;700&family=Patrick+Hand&family=Zen+Maru+Gothic:wght@400;700;900&family=M+PLUS+Rounded+1c:wght@400;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg-page:#FFF7ED;--panel-w:380px;--border:#FFEDD5;--text-main:#7c2d12}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 120% at 20% 10%, #FFF7ED 0%, #FFEDD5 18%, #FDE68A 42%, #FDBA74 68%, #F97316 100%);color:var(--text-main);font-family:"Zen Maru Gothic", ui-sans-serif, system-ui, sans-serif;min-height:100vh}
+.btn{border:1px solid var(--border);background:#fff;padding:8px 14px;border-radius:999px;font-size:13px;cursor:pointer}
+.btn.active{background:#7c2d12;color:#fff;border-color:#7c2d12}
+.btn-danger{background:#fff0f0;border-color:#fecaca}
+.btn-small{padding:4px 8px;font-size:11px}
+.header{position:sticky;top:0;z-index:10;background:rgba(255,255,255,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);padding:12px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.main{max-width:1400px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:16px}
+@media (min-width:900px){.main{flex-direction:row;align-items:flex-start;gap:20px;padding:20px}.panel{width:var(--panel-w);position:sticky;top:72px;flex-shrink:0}.canvas-area{flex:1;display:flex;justify-content:center}}
+.panel{background:#fff;border:1px solid var(--border);border-radius:18px;padding:14px;order:2;max-height:calc(100vh - 90px);overflow-y:auto}
+@media (min-width:900px){.panel{order:1}}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tab-btn{flex:1;padding:8px;border-radius:10px;border:1px solid var(--border);background:#fff;font-size:13px;cursor:pointer}
+.tab-btn.active{background:#FFF7ED;font-weight:700}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.grid-item{aspect-ratio:1;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:#fff;cursor:pointer;position:relative}
+.grid-item img{width:100%;height:100%;object-fit:contain;background:#fff}
+.grid-item .label{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.55);color:#fff;font-size:10px;text-align:center;padding:3px 0}
+.upload-box{margin-top:10px;border:1px dashed #fdba74;border-radius:12px;padding:10px;text-align:center}
+.count-badge{display:inline-block;background:#7c2d12;color:#fff;border-radius:999px;padding:2px 8px;font-size:11px;margin-left:6px}
+.text-controls{display:flex;flex-direction:column;gap:10px}
+.text-controls textarea{width:100%;min-height:80px;border:1px solid var(--border);border-radius:10px;padding:8px;resize:vertical}
+.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.range{flex:1}
+.canvas-area{order:1}
+@media (min-width:900px){.canvas-area{order:2}}
+.canvas-wrap{width:min(92vw,520px);margin:0 auto;position:relative;overflow:hidden;border-radius:24px;box-shadow:0 20px 40px rgba(124,45,18,0.15);background:#fff}
+#canvas{width:1080px;height:1350px;transform-origin:top left;position:relative;background:#fff;overflow:hidden;user-select:none;touch-action:none}
+#canvas.story{height:1920px}
+#canvas-bg{position:absolute;inset:0;pointer-events:none;z-index:0}
+#canvas-bg img{width:100%;height:100%;object-fit:cover;pointer-events:none}
+#canvas-items{position:absolute;inset:0;z-index:1}
+#drag-shield{position:absolute;inset:0;z-index:9;display:none;background:transparent;pointer-events:auto;touch-action:none}
+#drag-shield.show{display:block}
+.safe-guide{position:absolute;inset:0;border:1px dashed rgba(124,45,18,0.25);pointer-events:none;z-index:5}
+.safe-guide.inner{inset:6%}
+.item{position:absolute;left:0;top:0;transform-origin:center center;touch-action:none;cursor:grab;user-select:none;will-change:transform,left,top}
+.item img{pointer-events:none;user-select:none;-webkit-user-drag:none;display:block;width:auto;height:auto;max-width:none;object-fit:contain}
+.item.selected{outline:4px dashed #7c2d12;outline-offset:8px;border-radius:8px}
+.handle{position:absolute;width:44px;height:44px;background:#fff;border:2px solid #7c2d12;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;cursor:pointer;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,0.2)}
+.handle.del{left:-18px;top:-18px;background:#ef4444;color:#fff;border-color:#ef4444}
+.handle.rot{right:-18px;top:-18px}
+.handle.scale{right:-18px;bottom:-18px;cursor:nwse-resize;background:#7c2d12;color:#fff}
+.handle.up{left:-18px;bottom:48px}
+.handle.down{left:-18px;bottom:-18px}
+.handle.w-left{left:-22px;top:50%;transform:translateY(-50%);cursor:ew-resize;background:#7c2d12;color:#fff;width:30px;height:60px;border-radius:10px;font-size:10px}
+.handle.w-right{right:-22px;top:50%;transform:translateY(-50%);cursor:ew-resize;background:#7c2d12;color:#fff;width:30px;height:60px;border-radius:10px;font-size:10px}
+.handle.flip{left:50%;bottom:-22px;transform:translateX(-50%);cursor:pointer;background:#fff;color:#7c2d12;width:76px;height:34px;border-radius:10px;font-size:11px}
+.handle.flip.active{background:#7c2d12;color:#fff}
+body.dragging{overflow:hidden;touch-action:none;user-select:none}
+.text-box{white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;line-height:1.4;box-sizing:border-box;display:block;max-width:100%;min-width:80px;cursor:grab}
+.layer-list{margin-top:14px;border-top:1px solid var(--border);padding-top:10px}
+.layer-item{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;background:#fff;font-size:12px}
+.layer-item.active{border-color:#7c2d12;background:#FFF7ED}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:100;padding:12px}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:16px;padding:16px;width:min(90%,400px);max-height:90vh;overflow-y:auto}
+/* 預覽 modal - 要收進螢幕內，側面不要被截掉 */
+#modal-preview{padding:16px}
+#modal-preview .modal-box{width:auto;max-width:96vw;max-height:96vh;padding:12px;background:transparent;border:none;box-shadow:none;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden}
+#preview-wrap{margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,0.4);position:relative;max-width:100%}
+#modal-download .modal-box{width:min(92vw,360px);max-height:70vh;display:flex;flex-direction:column}
+#modal-download .modal-content{overflow-y:auto;flex:1;padding-right:2px}
+#modal-download .modal-footer{flex-shrink:0;padding-top:10px;border-top:1px solid var(--border);margin-top:10px;display:flex;gap:8px;justify-content:flex-end;background:#fff;position:sticky;bottom:0}
+.bless-btn{border:1px solid var(--border);background:#FFF7ED;padding:12px 14px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer;text-align:center;width:100%}
+.single-edit-panel{border:2px solid #7c2d12;border-radius:12px;padding:12px;background:#FFF7ED;margin-bottom:12px}
+.font-select{width:100%;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px}
+</style>
+</head>
+<body>
+<header class="header">
+<h1>聖誕狗狗 V41</h1>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn active" id="btn-portrait">IG直式 1080x1350</button>
+<button class="btn" id="btn-story">限動滿版 1080x1920</button>
+<button class="btn" id="btn-guide">安全框</button>
+</div>
+<div style="display:flex;gap:8px;flex-wrap:wrap">
+<button class="btn" id="btn-preview">預覽 (同尺寸)</button>
+<button class="btn" id="btn-clear">清空</button>
+<select id="export-type" class="btn"><option value="png">PNG</option><option value="jpg">JPG</option></select>
+<button class="btn active" id="btn-export">下載</button>
+</div>
+</header>
+<main class="main">
+<aside class="panel">
+<div class="tabs">
+<button class="tab-btn active" data-tab="dogs">狗狗</button>
+<button class="tab-btn" data-tab="acc">配件</button>
+<button class="tab-btn" data-tab="bg">背景</button>
+<button class="tab-btn" data-tab="text">文字</button>
+</div>
+
+<!-- 單一文字編輯區：編輯+字型+大小+置左中右+字距 - 不會同時出現兩個 -->
+<div id="single-text-editor" style="display:none" class="single-edit-panel">
+<div style="font-size:13px;font-weight:800;margin-bottom:8px">✏️ 文字編輯 - 單一編輯區</div>
+<textarea id="unified-text-content" style="width:100%;min-height:70px;border:1px solid var(--border);border-radius:10px;padding:8px;font-size:13px;resize:vertical" placeholder="輸入文字內容"></textarea>
+<div style="margin-top:8px">
+<label style="font-size:12px;font-weight:700">字型 - 手寫體 / 華康圓體</label>
+<select id="unified-text-font" class="font-select"></select>
+<div style="margin-top:6px">
+<label style="font-size:11px">暫時匯入字型檔 (關閉瀏覽器清除)：</label>
+<input type="file" id="custom-font-upload" accept=".ttf,.otf,.woff,.woff2" style="width:100%;font-size:11px;margin-top:4px">
+<div id="custom-font-list" style="font-size:10px;color:#666;margin-top:4px"></div>
+</div>
+</div>
+<div class="row" style="margin-top:8px">
+<button class="btn btn-small" data-align="left">置左</button>
+<button class="btn btn-small active" data-align="center">置中</button>
+<button class="btn btn-small" data-align="right">置右</button>
+</div>
+<div class="row"><label>大小</label><input type="range" id="unified-text-size" min="40" max="300" value="96" class="range"><span id="unified-text-size-val">96</span></div>
+<div class="row"><label>字距</label><input type="range" id="unified-text-spacing" min="-5" max="30" value="0" class="range"><span id="unified-text-spacing-val">0</span></div>
+<div class="row"><label>框寬</label><input type="range" id="unified-text-boxw" min="160" max="1000" value="600" class="range"><span id="unified-text-boxw-val">600</span></div>
+<div class="row"><label>行距</label><input type="range" id="unified-text-lineh" min="0.8" max="2.5" step="0.1" value="1.4" class="range"><span id="unified-text-lineh-val">1.4</span></div>
+<div class="row"><label>顏色</label><input type="color" id="unified-text-color" value="#7c2d12"></div>
+<div style="margin-top:8px;display:flex;gap:6px">
+<button class="btn btn-small" id="btn-flip-selected">↔ 翻轉</button>
+<button class="btn btn-small btn-danger" id="btn-del-selected">刪除</button>
+</div>
+</div>
+
+<div class="tab-panel" id="panel-dogs">
+<div class="grid" id="grid-dogs"></div>
+<div class="upload-box">
+<div style="font-size:12px;margin-bottom:6px">自訂狗狗 <span class="count-badge" id="count-dogs">0/8</span><br><span style="font-size:10px;color:#999">不含預設，最多8張</span></div>
+<input type="file" id="upload-dogs" accept="image/*" multiple>
+<div class="grid" id="custom-dogs" style="margin-top:8px"></div>
+</div>
+</div>
+<div class="tab-panel" id="panel-acc" style="display:none">
+<div class="grid" id="grid-acc"></div>
+<div class="upload-box">
+<div style="font-size:12px;margin-bottom:6px">自訂配件 <span class="count-badge" id="count-acc">0/8</span><br><span style="font-size:10px;color:#999">不含預設，最多8張</span></div>
+<input type="file" id="upload-acc" accept="image/*" multiple>
+<div class="grid" id="custom-acc" style="margin-top:8px"></div>
+</div>
+</div>
+<div class="tab-panel" id="panel-bg" style="display:none">
+<div class="grid" id="grid-bg" style="grid-template-columns:repeat(2,1fr)"></div>
+<div class="upload-box">
+<div style="font-size:12px;margin-bottom:6px">自訂背景 <span class="count-badge" id="count-bg">0/8</span><br><span style="font-size:10px;color:#999">不含預設，最多8張</span></div>
+<input type="file" id="upload-bg" accept="image/*" multiple>
+<div class="grid" id="custom-bg" style="margin-top:8px;grid-template-columns:repeat(2,1fr)"></div>
+</div>
+</div>
+<div class="tab-panel" id="panel-text" style="display:none">
+<div class="text-controls" id="text-add-controls">
+<div style="font-size:12px;font-weight:700">🎄 預設祝福語 - 一句英文</div>
+<button class="bless-btn" id="bless-one">Merry Christmas!</button>
+<textarea id="text-input" placeholder="或輸入自訂文字" style="margin-top:10px"></textarea>
+<button class="btn active" id="add-text">加入文字到畫布</button>
+<div style="font-size:11px;color:#666;background:#FFF7ED;padding:8px;border-radius:8px">加入後點選文字，上方單一編輯區統一編輯，不會同時出現兩個編輯區</div>
+</div>
+<div id="text-editing-hint" style="display:none;font-size:12px;background:#FFF7ED;padding:10px;border-radius:10px;border:1px dashed var(--border)">正在編輯文字，請在上方單一編輯區修改 內容 / 字型 / 大小 / 置左中右 / 字距</div>
+</div>
+<div class="layer-list"><div style="font-size:12px;font-weight:700;margin-bottom:6px">圖層</div><div id="layer-items"></div></div>
+<div id="size-info" style="margin-top:12px;font-size:11px;background:#FFF7ED;padding:6px 10px;border-radius:8px">畫布：1080x1350 與輸出、預覽、檢視一樣大</div>
+</aside>
+<section class="canvas-area"><div class="canvas-wrap" id="canvas-wrap"><div id="canvas"><div id="canvas-bg"></div><div id="canvas-items"></div><div id="drag-shield"></div><div class="safe-guide" id="guide-outer" style="display:none"></div><div class="safe-guide inner" id="guide-inner" style="display:none"></div></div></div></section>
+</main>
+<div class="modal" id="modal-clear"><div class="modal-box"><div style="font-weight:700;margin-bottom:8px">確定清空？</div><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="cancel-clear">取消</button><button class="btn btn-danger" id="confirm-clear">確定</button></div></div></div>
+<div class="modal" id="modal-preview"><div class="modal-box"><div id="preview-label" style="font-weight:700;margin-bottom:10px;color:#fff;background:rgba(0,0,0,0.5);padding:6px 12px;border-radius:999px;font-size:12px">檢視 / 預覽 - 與畫布狀態一樣</div><div id="preview-wrap"></div><div style="margin-top:12px"><button class="btn" id="close-preview">關閉</button></div></div></div>
+<div class="modal" id="modal-download">
+  <div class="modal-box">
+    <div class="modal-content">
+      <div style="font-size:14px;font-weight:800;margin-bottom:8px;text-align:center">下載預覽 - 與畫布狀態一樣</div>
+      <div id="download-preview-wrap" style="width:100%;max-width:200px;margin:0 auto 8px;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 8px 20px rgba(0,0,0,0.15);aspect-ratio:4/5">
+        <img id="download-preview-img" style="width:100%;height:100%;object-fit:contain;display:block">
+      </div>
+      <div id="download-info" style="font-size:11px;color:#666;margin-bottom:8px;background:#FFF7ED;padding:6px 10px;border-radius:8px;text-align:center">IG直式 1080x1350</div>
+      <div style="margin-bottom:6px;text-align:left">
+        <label style="font-size:12px;font-weight:700">檔名：</label>
+        <input type="text" id="download-filename" style="width:100%;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:10px;font-size:13px" value="christmas-card">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="cancel-download">取消</button>
+      <button class="btn active" id="confirm-download">下載</button>
+    </div>
+  </div>
+</div>
+<script>
+// ===================== 統整在一個區塊 - 方便備註說明與修改 =====================
+// 【素材管理】所有預設圖都集中在這裡，改路徑就能替換，方便自己修改
+// 資料夾結構：
+//   assets/dogs/         -> 狗狗圖片 (每隻有品種名稱)
+//   assets/accessories/  -> 配件圖片  
+//   assets/backgrounds/  -> 背景圖片
+// 如果圖片找不到，會自動用空圖佔位（無emoji，虛線框），畫布不會消失
+
+function makeEmptyPlaceholder(w, h, bgColor){
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;
+  const ctx=cv.getContext('2d');
+  ctx.fillStyle=bgColor||'#FFFFFF';ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle='#E8C4A0';ctx.lineWidth=3;ctx.setLineDash([14,10]);
+  ctx.strokeRect(6,6,w-12,h-12);
+  return cv.toDataURL('image/png');
+}
+
+const ASSETS = {
+  // 狗狗：每隻都有品種名稱，路徑在 assets/dogs/，改檔名即可替換
+  dogs: [
+    {src:"assets/dogs/dog1.png", name:"柴柴"},
+    {src:"assets/dogs/dog2.png", name:"柯基"},
+    {src:"assets/dogs/dog3.png", name:"雪納瑞"},
+    {src:"assets/dogs/dog4.png", name:"貴賓"},
+    {src:"assets/dogs/dog5.png", name:"米克斯"},
+    {src:"assets/dogs/dog6.png", name:"哈士奇"},
+    {src:"assets/dogs/dog7.png", name:"臘腸"},
+    {src:"assets/dogs/dog8.png", name:"法鬥"}
+  ],
+  // 配件：路徑在 assets/accessories/
+  accessories: [
+    "assets/accessories/acc1.png",
+    "assets/accessories/acc2.png",
+    "assets/accessories/acc3.png",
+    "assets/accessories/acc4.png"
+  ],
+  // 背景：可純色或圖片，圖片路徑在 assets/backgrounds/
+  backgrounds: [
+    {color:"#FFF7ED", img:"", name:"暖橘"},
+    {color:"#FEF2F2", img:"", name:"雪紅"},
+    {color:"#F0FDF4", img:"", name:"松綠"},
+    {color:"#FEF9C3", img:"", name:"奶黃"}
+  ]
+};
+
+// 【字型管理】手寫體、華康圓體替代，可暫時匯入，關閉瀏覽器清除
+// 華康圓體為付費字型，這裡用開源相似字型替代：Zen Maru Gothic、M PLUS Rounded 1c
+const FONTS = [
+  {label:"系統預設", value:"system", family:"ui-sans-serif, system-ui, sans-serif"},
+  {label:"手寫體 Caveat", value:"caveat", family:"'Caveat', cursive"},
+  {label:"手寫體 Dancing Script", value:"dancing", family:"'Dancing Script', cursive"},
+  {label:"手寫體 Patrick Hand", value:"patrick", family:"'Patrick Hand', cursive"},
+  {label:"華康圓體替代 Zen Maru Gothic", value:"zenmaru", family:"'Zen Maru Gothic', sans-serif"},
+  {label:"華康圓體替代 M PLUS Rounded", value:"mplus", family:"'M PLUS Rounded 1c', sans-serif"}
+];
+// ==========================================================================
+
+function getSrc(i){return typeof i==='string'?i:i.src;}
+function getName(i,fb){return typeof i==='string'?fb:(i.name||fb);}
+let customDogs=[],customAcc=[],customBg=[];
+let customFonts=[]; // 暫時匯入的字型，關閉瀏覽器清除，不存 localStorage
+const MAX_CUSTOM = 8;
+let currentSize="portrait";
+let currentBg=ASSETS.backgrounds[0];
+let layers=[],selectedId=null,layerCounter=0;
+
+function loadImage(src){return new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej();im.src=src;});}
+
+function updateCounts(){
+  document.getElementById('count-dogs').textContent = customDogs.length + '/8';
+  document.getElementById('count-acc').textContent = customAcc.length + '/8';
+  document.getElementById('count-bg').textContent = customBg.length + '/8';
+}
+
+function updateFontSelectOptions(){
+  const sel=document.getElementById('unified-text-font');
+  const currentVal=sel.value;
+  sel.innerHTML='';
+  [...FONTS, ...customFonts].forEach(f=>{
+    const opt=document.createElement('option');
+    opt.value=f.value;
+    opt.textContent=f.label;
+    opt.style.fontFamily=f.family;
+    sel.appendChild(opt);
+  });
+  if(currentVal) sel.value=currentVal;
+  document.getElementById('custom-font-list').textContent = customFonts.length ? '已匯入：' + customFonts.map(f=>f.label).join(', ') + ' (關閉瀏覽器清除)' : '';
+}
+
+async function addCustomFont(file){
+  const fontName='Custom_'+Date.now()+'_'+Math.floor(Math.random()*1000);
+  const url=URL.createObjectURL(file);
+  try{
+    const face=new FontFace(fontName, `url(${url})`);
+    const loaded=await face.load();
+    document.fonts.add(loaded);
+    const label=file.name.replace(/\.(ttf|otf|woff2|woff)$/i,'') + ' (暫存)';
+    customFonts.push({label:label, value:fontName, family:`'${fontName}'`, url:url});
+    updateFontSelectOptions();
+    document.getElementById('unified-text-font').value=fontName;
+    if(selectedId){
+      const l=layers.find(x=>x.id===selectedId);
+      if(l && l.type==='text'){ l.fontFamily=fontName; l.fontFamilyCss=`'${fontName}'`; renderLayers(); }
+    }
+  }catch(e){ alert('字型載入失敗：'+e.message); }
+}
+
+function getFontFamilyCss(value){
+  const all=[...FONTS, ...customFonts];
+  const found=all.find(f=>f.value===value);
+  return found ? found.family : FONTS[0].family;
+}
+
+function renderGrids(){
+  const dg=document.getElementById('grid-dogs');dg.innerHTML='';
+  ASSETS.dogs.forEach((it,i)=>{
+    const src=getSrc(it);const nm=getName(it,'狗狗'+(i+1));
+    const d=document.createElement('div');d.className='grid-item';
+    const img=document.createElement('img');img.src=src;
+    img.onerror=()=>{img.src=makeEmptyPlaceholder(800,800,['#FFE4B5','#FDE68A','#FECACA','#BFDBFE','#BBF7D0','#E9D5FF','#FED7AA','#F5D0FE'][i%8]);};
+    const label=document.createElement('div');label.className='label';label.textContent=nm;
+    d.appendChild(img);d.appendChild(label);
+    d.onclick=()=>addImageLayer('dog',src,nm);dg.appendChild(d);
+  });
+  const cd=document.getElementById('custom-dogs');cd.innerHTML='';
+  customDogs.forEach((src,i)=>{
+    const d=document.createElement('div');d.className='grid-item';
+    d.innerHTML=`<img src="${src}"><div class="label">自訂${i+1}<span style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border-radius:999px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px" onclick="event.stopPropagation();removeCustom('dogs',${i})">x</span></div>`;
+    d.onclick=()=>addImageLayer('dog',src);cd.appendChild(d);
+  });
+  const ag=document.getElementById('grid-acc');ag.innerHTML='';
+  ASSETS.accessories.forEach((s,i)=>{
+    const d=document.createElement('div');d.className='grid-item';
+    const img=document.createElement('img');img.src=s;
+    img.onerror=()=>{img.src=makeEmptyPlaceholder(400,400,['#FECACA','#FEF3C7','#BBF7D0','#BFDBFE'][i%4]);};
+    const label=document.createElement('div');label.className='label';label.textContent='配件'+(i+1);
+    d.appendChild(img);d.appendChild(label);
+    d.onclick=()=>addImageLayer('acc',s);ag.appendChild(d);
+  });
+  const ca=document.getElementById('custom-acc');ca.innerHTML='';
+  customAcc.forEach((src,i)=>{
+    const d=document.createElement('div');d.className='grid-item';
+    d.innerHTML=`<img src="${src}"><div class="label">自訂${i+1}<span style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border-radius:999px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px" onclick="event.stopPropagation();removeCustom('acc',${i})">x</span></div>`;
+    d.onclick=()=>addImageLayer('acc',src);ca.appendChild(d);
+  });
+  const bg=document.getElementById('grid-bg');bg.innerHTML='';
+  ASSETS.backgrounds.forEach((b,i)=>{
+    const d=document.createElement('div');d.className='grid-item';d.style.background=b.color;
+    if(b.img){
+      const img=document.createElement('img');img.src=b.img;img.style.position='absolute';img.style.inset='0';img.style.width='100%';img.style.height='100%';img.style.objectFit='cover';
+      img.onerror=()=>{img.style.display='none';};
+      d.appendChild(img);
+    }
+    const label=document.createElement('div');label.className='label';label.textContent=b.name;
+    d.appendChild(label);
+    d.onclick=()=>setBackground(b);bg.appendChild(d);
+  });
+  const cb=document.getElementById('custom-bg');cb.innerHTML='';
+  customBg.forEach((b,i)=>{
+    const d=document.createElement('div');d.className='grid-item';d.style.background=b.color;
+    d.innerHTML=`<img src="${b.img}" style="width:100%;height:100%;object-fit:cover"><div class="label">${b.name}<span style="position:absolute;top:2px;right:2px;background:#ef4444;color:#fff;border-radius:999px;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:10px" onclick="event.stopPropagation();removeCustom('bg',${i})">x</span></div>`;
+    d.onclick=()=>setBackground(b);cb.appendChild(d);
+  });
+  updateCounts();
+}
+function removeCustom(type, idx){
+  if(type==='dogs') customDogs.splice(idx,1);
+  if(type==='acc') customAcc.splice(idx,1);
+  if(type==='bg') customBg.splice(idx,1);
+  renderGrids();
+}
+function setBackground(bg){currentBg=bg;const el=document.getElementById('canvas-bg');el.innerHTML='';el.style.background=bg.color||'#fff';if(bg.img){const im=document.createElement('img');im.src=bg.img;im.onerror=()=>{im.style.display='none';};el.appendChild(im);}}
+function addImageLayer(type,src,name){
+  layerCounter++;const id='L'+Date.now()+'_'+layerCounter;
+  const baseW = type==='dog'? 453 : 248;
+  layers.push({id,type,src,name:name||'',x:0.5,y:0.5,scale:1,rot:0,baseW,flipX:false,z:layers.length});
+  selectedId=id;renderLayers();renderLayerList();
+}
+function addTextLayerWithText(txt){
+  if(!txt.trim()){alert('請輸入文字');return;}
+  layerCounter++;const id='L'+Date.now()+'_'+layerCounter;
+  const defaultFont=document.getElementById('unified-text-font')?.value || 'system';
+  layers.push({id,type:'text',text:txt,x:0.5,y:0.65,scale:1,rot:0,baseW:600,flipX:false,fontSize:96,color:'#7c2d12',align:'center',boxW:600,lineHeight:1.4,letterSpacing:0,fontFamily:defaultFont,fontFamilyCss:getFontFamilyCss(defaultFont),z:layers.length});
+  selectedId=id;renderLayers();renderLayerList();
+  document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+  document.querySelector('[data-tab="text"]').classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');
+  document.getElementById('panel-text').style.display='block';
+}
+function addTextLayer(){ addTextLayerWithText(document.getElementById('text-input').value.trim()); }
+
+function renderLayers(){
+  const cont=document.getElementById('canvas-items');cont.innerHTML='';
+  const sorted=[...layers].sort((a,b)=>a.z-b.z);
+  sorted.forEach(layer=>{
+    const el=document.createElement('div');el.className='item'+(layer.id===selectedId?' selected':'');el.dataset.id=layer.id;
+    const flip=layer.flipX?-1:1;
+    el.style.left=(layer.x*100)+'%';el.style.top=(layer.y*100)+'%';el.style.transform=`translate(-50%, -50%) rotate(${layer.rot}deg) scale(${flip*layer.scale}, ${layer.scale})`;el.style.zIndex=layer.z;
+    if(layer.type==='text'){
+      const tb=document.createElement('div');tb.className='text-box';
+      tb.style.width=layer.boxW+'px';
+      tb.style.fontSize=layer.fontSize+'px';
+      tb.style.color=layer.color;
+      tb.style.textAlign=layer.align;
+      tb.style.lineHeight=layer.lineHeight;
+      tb.style.letterSpacing=(layer.letterSpacing||0)+'px';
+      tb.style.fontWeight='800';
+      tb.style.fontFamily=layer.fontFamilyCss || getFontFamilyCss(layer.fontFamily);
+      tb.textContent=layer.text;
+      tb.onpointerdown=(e)=>{ if(e.target.classList.contains('handle')) return; e.stopPropagation(); startDrag(e,layer); };
+      el.appendChild(tb);
+    }else{
+      const im=document.createElement('img');im.src=layer.src;im.style.width=layer.baseW+'px';im.style.height='auto';im.draggable=false;
+      im.onerror=()=>{ im.src=makeEmptyPlaceholder(800,800,'#FFF7ED'); };
+      el.appendChild(im);
+    }
+    if(layer.id===selectedId){
+      const del=document.createElement('div');del.className='handle del';del.textContent='x';del.onpointerdown=(e)=>{e.stopPropagation();deleteLayer(layer.id);};
+      const wl=document.createElement('div');wl.className='handle w-left';wl.textContent='寬';wl.onpointerdown=(e)=>startTextWidth(e,layer,'left');
+      const wr=document.createElement('div');wr.className='handle w-right';wr.textContent='寬';wr.onpointerdown=(e)=>startTextWidth(e,layer,'right');
+      const rot=document.createElement('div');rot.className='handle rot';rot.textContent='旋轉';rot.onpointerdown=(e)=>startRotate(e,layer);
+      const sca=document.createElement('div');sca.className='handle scale';sca.textContent='縮放';sca.onpointerdown=(e)=>startScale(e,layer);
+      const flip=document.createElement('div');flip.className='handle flip'+(layer.flipX?' active':'');flip.textContent='翻轉';flip.onpointerdown=(e)=>{e.stopPropagation();toggleFlip(layer.id);};
+      const up=document.createElement('div');up.className='handle up';up.textContent='上';up.onpointerdown=(e)=>{e.stopPropagation();moveLayer(layer.id,1);};
+      const down=document.createElement('div');down.className='handle down';down.textContent='下';down.onpointerdown=(e)=>{e.stopPropagation();moveLayer(layer.id,-1);};
+      el.appendChild(del);el.appendChild(wl);el.appendChild(wr);el.appendChild(rot);el.appendChild(sca);el.appendChild(flip);el.appendChild(up);el.appendChild(down);
+    }
+    el.onpointerdown=(e)=>{ if(e.target.classList.contains('handle') || e.target.classList.contains('text-box')) return; startDrag(e,layer); };
+    cont.appendChild(el);
+  });
+}
+function updateSingleEditor(){
+  const editor=document.getElementById('single-text-editor');
+  const addControls=document.getElementById('text-add-controls');
+  const hint=document.getElementById('text-editing-hint');
+  if(!selectedId){
+    editor.style.display='none';
+    if(addControls) addControls.style.display='flex';
+    if(hint) hint.style.display='none';
+    return;
+  }
+  const l=layers.find(x=>x.id===selectedId);
+  if(!l || l.type!=='text'){
+    editor.style.display='none';
+    if(addControls) addControls.style.display='flex';
+    if(hint) hint.style.display='none';
+    return;
+  }
+  editor.style.display='block';
+  if(addControls) addControls.style.display='none';
+  if(hint) hint.style.display='block';
+  document.getElementById('unified-text-content').value = l.text;
+  document.getElementById('unified-text-size').value = l.fontSize;
+  document.getElementById('unified-text-size-val').textContent = l.fontSize;
+  document.getElementById('unified-text-spacing').value = l.letterSpacing||0;
+  document.getElementById('unified-text-spacing-val').textContent = l.letterSpacing||0;
+  document.getElementById('unified-text-boxw').value = l.boxW;
+  document.getElementById('unified-text-boxw-val').textContent = l.boxW;
+  document.getElementById('unified-text-lineh').value = l.lineHeight;
+  document.getElementById('unified-text-lineh-val').textContent = l.lineHeight;
+  document.getElementById('unified-text-color').value = l.color;
+  document.getElementById('unified-text-font').value = l.fontFamily || 'system';
+  document.querySelectorAll('#single-text-editor [data-align]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.align===l.align);
+  });
+}
+function renderLayerList(){
+  const list=document.getElementById('layer-items');list.innerHTML='';
+  const sorted=[...layers].sort((a,b)=>b.z-a.z);
+  updateSingleEditor();
+  sorted.forEach(layer=>{
+    const name=layer.type==='text'?('文字: '+layer.text.slice(0,12)):((layer.name||layer.type+' '+layer.id.slice(-3)));
+    const row=document.createElement('div');row.className='layer-item'+(layer.id===selectedId?' active':'');
+    row.innerHTML=`<span>${name}</span><span><button class="btn btn-small" data-act="up">上</button> <button class="btn btn-small" data-act="down">下</button> <button class="btn btn-small btn-danger" data-act="del">刪</button></span>`;
+    row.onclick=()=>{selectedId=layer.id;renderLayers();renderLayerList();};
+    row.querySelector('[data-act="up"]').onclick=(e)=>{e.stopPropagation();moveLayer(layer.id,1);};
+    row.querySelector('[data-act="down"]').onclick=(e)=>{e.stopPropagation();moveLayer(layer.id,-1);};
+    row.querySelector('[data-act="del"]').onclick=(e)=>{e.stopPropagation();deleteLayer(layer.id);};
+    list.appendChild(row);
+  });
+}
+function toggleFlip(id){const l=layers.find(x=>x.id===id);if(!l)return;l.flipX=!l.flipX;renderLayers();renderLayerList();}
+function deleteLayer(id){layers=layers.filter(l=>l.id!==id);layers.forEach((l,i)=>l.z=i);if(selectedId===id)selectedId=null;renderLayers();renderLayerList();}
+function moveLayer(id,dir){const idx=layers.findIndex(l=>l.id===id);if(idx<0)return;const nidx=idx+dir;if(nidx<0||nidx>=layers.length)return;const tmp=layers[idx];layers[idx]=layers[nidx];layers[nidx]=tmp;layers.forEach((l,i)=>l.z=i);renderLayers();renderLayerList();}
+let dragState=null;
+function showShield(){document.getElementById('drag-shield').classList.add('show');document.body.classList.add('dragging');}
+function hideShield(){document.getElementById('drag-shield').classList.remove('show');document.body.classList.remove('dragging');}
+function startDrag(e,layer){if(e.target.classList.contains('handle'))return;e.preventDefault();e.stopPropagation();const wrap=document.getElementById('canvas-wrap');const wrapRect=wrap.getBoundingClientRect();const startX=e.clientX,startY=e.clientY,origX=layer.x,origY=layer.y;if(selectedId!==layer.id){selectedId=layer.id;renderLayerList();}showShield();dragState={type:'drag',layer,startX,startY,origX,origY,wrapRect};window.addEventListener('pointermove',onPointerMove,{passive:false});window.addEventListener('pointerup',onPointerUp);}
+function startTextWidth(e,layer,side){e.preventDefault();e.stopPropagation();showShield();dragState={type:'textW',layer,startX:e.clientX,origW:layer.boxW,side};window.addEventListener('pointermove',onPointerMove,{passive:false});window.addEventListener('pointerup',onPointerUp);}
+function startScale(e,layer){e.preventDefault();e.stopPropagation();showShield();const wrap=document.getElementById('canvas-wrap');const wrapRect=wrap.getBoundingClientRect();const cx=wrapRect.left+wrapRect.width*layer.x,cy=wrapRect.top+wrapRect.height*layer.y;dragState={type:'scale',layer,startDist:Math.hypot(e.clientX-cx,e.clientY-cy),origScale:layer.scale,centerX:cx,centerY:cy};window.addEventListener('pointermove',onPointerMove,{passive:false});window.addEventListener('pointerup',onPointerUp);}
+function startRotate(e,layer){e.preventDefault();e.stopPropagation();showShield();const wrap=document.getElementById('canvas-wrap');const wrapRect=wrap.getBoundingClientRect();const cx=wrapRect.left+wrapRect.width*layer.x,cy=wrapRect.top+wrapRect.height*layer.y;const sa=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;dragState={type:'rotate',layer,startAng:sa,origRot:layer.rot,centerX:cx,centerY:cy};window.addEventListener('pointermove',onPointerMove,{passive:false});window.addEventListener('pointerup',onPointerUp);}
+function onPointerMove(e){if(!dragState)return;e.preventDefault();const {type,layer}=dragState;const wrap=document.getElementById('canvas-wrap');const wrapRect=wrap.getBoundingClientRect();if(type==='drag'){const dx=(e.clientX-dragState.startX)/wrapRect.width,dy=(e.clientY-dragState.startY)/wrapRect.height;let nx=dragState.origX+dx,ny=dragState.origY+dy;layer.x=nx;layer.y=ny;const el2=document.querySelector(`.item[data-id="${layer.id}"]`);if(el2){el2.style.left=(nx*100)+'%';el2.style.top=(ny*100)+'%';}}else if(type==='scale'){const cur=Math.hypot(e.clientX-dragState.centerX,e.clientY-dragState.centerY);let ns=dragState.origScale*(cur/(dragState.startDist||1));ns=Math.min(4,Math.max(0.15,ns));layer.scale=ns;const el=document.querySelector(`.item[data-id="${layer.id}"]`);if(el){const flip=layer.flipX?-1:1;el.style.transform=`translate(-50%, -50%) rotate(${layer.rot}deg) scale(${flip*ns}, ${ns})`;}}else if(type==='rotate'){const curA=Math.atan2(e.clientY-dragState.centerY,e.clientX-dragState.centerX)*180/Math.PI;layer.rot=dragState.origRot+(curA-dragState.startAng);const el=document.querySelector(`.item[data-id="${layer.id}"]`);if(el){const flip=layer.flipX?-1:1;el.style.transform=`translate(-50%, -50%) rotate(${layer.rot}deg) scale(${flip*layer.scale}, ${layer.scale})`;}}else if(type==='textW'){const delta=(e.clientX-dragState.startX)/(wrapRect.width/1080);let newW=dragState.origW+(dragState.side==='right'?delta/(layer.scale||1):-delta/(layer.scale||1));newW=Math.min(1000,Math.max(160,newW));layer.boxW=newW;const el=document.querySelector(`.item[data-id="${layer.id}"] .text-box`);if(el)el.style.width=newW+'px';}}
+function onPointerUp(){hideShield();dragState=null;window.removeEventListener('pointermove',onPointerMove);window.removeEventListener('pointerup',onPointerUp);renderLayers();renderLayerList();}
+document.getElementById('canvas').addEventListener('pointerdown',(e)=>{if(e.target.id==='canvas'||e.target.id==='canvas-items'||e.target.id==='canvas-bg'||e.target.id==='drag-shield'){selectedId=null;renderLayers();renderLayerList();}});
+function updateCanvasScale(){const wrap=document.getElementById('canvas-wrap');const canvas=document.getElementById('canvas');const wrapW=wrap.getBoundingClientRect().width;const scale=wrapW/1080;canvas.style.transform=`scale(${scale})`;const h=currentSize==='portrait'?1350:1920;wrap.style.height=(h*scale)+'px';canvas.style.transformOrigin='top left';}
+function setSize(s){currentSize=s;document.getElementById('btn-portrait').classList.toggle('active',s==='portrait');document.getElementById('btn-story').classList.toggle('active',s==='story');const cv=document.getElementById('canvas');cv.classList.toggle('story',s==='story');cv.style.height=s==='portrait'?'1350px':'1920px';document.getElementById('size-info').textContent='畫布：1080x'+(s==='portrait'?'1350':'1920')+' 與輸出、預覽、檢視一樣大，位置一樣';updateCanvasScale();renderLayers();}
+function handleUpload(input,type){
+  const files=input.files;if(!files.length)return;
+  let targetArr=type==='dogs'?customDogs:type==='acc'?customAcc:customBg;
+  if(targetArr.length>=MAX_CUSTOM){alert('已達上限 '+MAX_CUSTOM+' 張'); input.value=''; return;}
+  const remaining=MAX_CUSTOM-targetArr.length;
+  Array.from(files).slice(0,remaining).forEach(f=>{
+    const r=new FileReader();r.onload=ev=>{
+      const d=ev.target.result;
+      if(type==='dogs') customDogs.push(d); else if(type==='acc') customAcc.push(d); else customBg.push({color:'#fff',img:d,name:'自訂'});
+      renderGrids();
+    };r.readAsDataURL(f);
+  });
+  input.value='';
+}
+function measureTextWithSpacing(ctx, text, ls){
+  if(!ls) return ctx.measureText(text).width;
+  let w=0; for(let i=0;i<text.length;i++){ w+=ctx.measureText(text[i]).width; if(i<text.length-1) w+=ls; } return w;
+}
+async function exportCanvas(format, returnBlob=false){
+  const w=1080;let h=currentSize==='portrait'?1350:1920;
+  const cv=document.createElement('canvas');cv.width=w;cv.height=h;const ctx=cv.getContext('2d');
+  await document.fonts.ready;
+  ctx.fillStyle=currentBg.color||'#fff';ctx.fillRect(0,0,w,h);
+  if(currentBg.img){try{const bg=await loadImage(currentBg.img);ctx.drawImage(bg,0,0,w,h);}catch(e){}}
+  const sorted=[...layers].sort((a,b)=>a.z-b.z);
+  for(const layer of sorted){
+    const cx=layer.x*w,cy=layer.y*h;ctx.save();ctx.translate(cx,cy);ctx.rotate(layer.rot*Math.PI/180);const flip=layer.flipX?-1:1;ctx.scale(layer.scale*flip,layer.scale);
+    if(layer.type==='text'){
+      const bw=layer.boxW,fs=layer.fontSize,ls=layer.letterSpacing||0;
+      const ff=layer.fontFamilyCss || getFontFamilyCss(layer.fontFamily);
+      ctx.fillStyle=layer.color;ctx.textBaseline='middle';ctx.font=`800 ${fs}px ${ff}`;
+      const maxW=bw,lineH=fs*layer.lineHeight;
+      const paras=layer.text.split('\n');let lines=[];paras.forEach(p=>{let cur='';for(let ch of p){const t=cur+ch;if(measureTextWithSpacing(ctx,t,ls)>maxW&&cur!==''){lines.push(cur);cur=ch;}else cur=t;}lines.push(cur);});
+      const total=lines.length*lineH;let sy=-total/2+lineH/2;
+      lines.forEach(ln=>{
+        if(!ls){
+          if(layer.align==='left'){ctx.textAlign='left';ctx.fillText(ln,-maxW/2,sy);}
+          else if(layer.align==='right'){ctx.textAlign='right';ctx.fillText(ln,maxW/2,sy);}
+          else{ctx.textAlign='center';ctx.fillText(ln,0,sy);}
+        }else{
+          const lineW=measureTextWithSpacing(ctx,ln,ls);
+          let startX=0; if(layer.align==='left') startX=-maxW/2; else if(layer.align==='right') startX=maxW/2-lineW; else startX=-lineW/2;
+          let curX=startX;
+          for(let i=0;i<ln.length;i++){ ctx.textAlign='left'; ctx.fillText(ln[i],curX,sy); curX+=ctx.measureText(ln[i]).width+ls; }
+        }
+        sy+=lineH;
+      });
+    }else{
+      try{
+        const im=await loadImage(layer.src);
+        const bw=layer.baseW,bh=bw*(im.height/im.width);
+        ctx.drawImage(im,-bw/2,-bh/2,bw,bh);
+      }catch(e){
+        ctx.strokeStyle='#E8C4A0';ctx.lineWidth=6;ctx.setLineDash([18,12]);
+        ctx.strokeRect(-layer.baseW/2,-layer.baseW/2,layer.baseW,layer.baseW);
+        ctx.setLineDash([]);
+      }
+    }
+    ctx.restore();
+  }
+  if(returnBlob){ return new Promise(resolve=>{ cv.toBlob(blob=>resolve(blob), format==='jpg'?'image/jpeg':'image/png', 0.92); }); }
+  return cv.toDataURL(format==='jpg'?'image/jpeg':'image/png',0.92);
+}
+document.getElementById('btn-portrait').onclick=()=>setSize('portrait');
+document.getElementById('btn-story').onclick=()=>setSize('story');
+document.getElementById('btn-guide').onclick=()=>{const o=document.getElementById('guide-outer'),i=document.getElementById('guide-inner');const s=o.style.display==='none';o.style.display=s?'block':'none';i.style.display=s?'block':'none';};
+document.querySelectorAll('.tab-btn').forEach(b=>{b.onclick=()=>{document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.tab-panel').forEach(p=>p.style.display='none');document.getElementById('panel-'+b.dataset.tab).style.display='block';};});
+document.getElementById('upload-dogs').onchange=function(){handleUpload(this,'dogs');};
+document.getElementById('upload-acc').onchange=function(){handleUpload(this,'acc');};
+document.getElementById('upload-bg').onchange=function(){handleUpload(this,'bg');};
+document.getElementById('bless-one').onclick=()=>{ addTextLayerWithText('Merry Christmas!'); };
+document.getElementById('add-text').onclick=addTextLayer;
+document.getElementById('unified-text-content').oninput=function(){ if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.text=this.value; renderLayers(); } } };
+document.getElementById('unified-text-size').oninput=function(){ document.getElementById('unified-text-size-val').textContent=this.value; if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.fontSize=parseInt(this.value); renderLayers(); } } };
+document.getElementById('unified-text-spacing').oninput=function(){ document.getElementById('unified-text-spacing-val').textContent=this.value; if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.letterSpacing=parseInt(this.value); renderLayers(); } } };
+document.getElementById('unified-text-boxw').oninput=function(){ document.getElementById('unified-text-boxw-val').textContent=this.value; if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.boxW=parseInt(this.value); renderLayers(); } } };
+document.getElementById('unified-text-lineh').oninput=function(){ document.getElementById('unified-text-lineh-val').textContent=this.value; if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.lineHeight=parseFloat(this.value); renderLayers(); } } };
+document.getElementById('unified-text-color').oninput=function(){ if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.color=this.value; renderLayers(); } } };
+document.getElementById('unified-text-font').onchange=function(){
+  if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.fontFamily=this.value; l.fontFamilyCss=getFontFamilyCss(this.value); renderLayers(); } }
+};
+document.getElementById('custom-font-upload').onchange=function(){ const f=this.files[0]; if(f) addCustomFont(f); this.value=''; };
+document.querySelectorAll('#single-text-editor [data-align]').forEach(b=>{
+  b.onclick=()=>{ document.querySelectorAll('#single-text-editor [data-align]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); if(selectedId){ const l=layers.find(x=>x.id===selectedId); if(l&&l.type==='text'){ l.align=b.dataset.align; renderLayers(); } } };
+});
+document.getElementById('btn-flip-selected').onclick=()=>{if(selectedId)toggleFlip(selectedId);};
+document.getElementById('btn-del-selected').onclick=()=>{if(selectedId)deleteLayer(selectedId);};
+document.getElementById('btn-clear').onclick=()=>document.getElementById('modal-clear').classList.add('show');
+document.getElementById('cancel-clear').onclick=()=>document.getElementById('modal-clear').classList.remove('show');
+document.getElementById('confirm-clear').onclick=()=>{layers=[];selectedId=null;renderLayers();renderLayerList();document.getElementById('modal-clear').classList.remove('show');};
+document.getElementById('btn-export').onclick=async()=>{
+  const w=1080; const h=currentSize==='portrait'?1350:1920;
+  const type=document.getElementById('export-type').value;
+  document.getElementById('download-info').textContent = (currentSize==='portrait'?'IG直式 4:5':'限動滿版 9:16') + ` ${w}x${h} .${type.toUpperCase()} | 與畫布狀態一樣`;
+  document.getElementById('download-filename').value = `christmas-${currentSize}-${w}x${h}`;
+  const previewImg=document.getElementById('download-preview-img');
+  if(previewImg){ previewImg.src=''; const url = await exportCanvas(type,false); if(url) previewImg.src=url; }
+  document.getElementById('modal-download').classList.add('show');
+};
+document.getElementById('cancel-download').onclick=()=>document.getElementById('modal-download').classList.remove('show');
+document.getElementById('modal-download').onclick=(e)=>{ if(e.target.id==='modal-download') e.currentTarget.classList.remove('show'); };
+document.getElementById('confirm-download').onclick=async()=>{
+  const type=document.getElementById('export-type').value;
+  const filename=document.getElementById('download-filename').value.trim() || `christmas-${currentSize}`;
+  const btn=document.getElementById('confirm-download'); const old=btn.textContent; btn.textContent='下載中...'; btn.disabled=true;
+  try{
+    const blob = await exportCanvas(type,true);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename+'.'+type; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    document.getElementById('modal-download').classList.remove('show');
+    setTimeout(()=>{ alert('✅ 已下載完成！\n\n檔名：'+filename+'.'+type+'\n位置：瀏覽器的「下載」資料夾\n尺寸：1080x'+(currentSize==='portrait'?'1350':'1920')+' 與畫布狀態一樣'); },300);
+  }catch(e){ alert('下載失敗：'+e.message); } finally{ btn.textContent=old; btn.disabled=false; }
+};
+// 檢視/預覽 - 與畫布狀態一樣，尺寸、位置一樣，收進螢幕內，側面不被截掉
+document.getElementById('btn-preview').onclick=()=>{
+  const wrap=document.getElementById('preview-wrap');wrap.innerHTML='';
+  const canvas=document.getElementById('canvas');
+  const clone=canvas.cloneNode(true);
+  clone.style.transform='none';
+  clone.style.width='1080px';
+  clone.style.height=currentSize==='portrait'?'1350px':'1920px';
+  const shield=clone.querySelector('#drag-shield');if(shield)shield.remove();
+  clone.querySelectorAll('.item').forEach(el=>{el.classList.remove('selected');el.querySelectorAll('.handle').forEach(h=>h.remove());});
+  clone.querySelectorAll('.safe-guide').forEach(g=>g.style.display='none');
+  // 關鍵：預覽要收進螢幕內，側面不被截掉
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const maxW = Math.min(vw * 0.92 - 24, 520); // 比螢幕小，留邊距
+  const maxH = vh * 0.70; // 預覽高度不超過 70vh，避免被切掉
+  let scale = maxW / 1080;
+  const h = currentSize==='portrait'?1350:1920;
+  if(h * scale > maxH){ scale = maxH / h; } // 高度也限制
+  wrap.style.width = (1080 * scale) + 'px';
+  wrap.style.height = (h * scale) + 'px';
+  wrap.style.maxWidth = '92vw';
+  wrap.style.maxHeight = '70vh';
+  wrap.style.overflow='hidden';
+  wrap.style.borderRadius='20px';
+  clone.style.transform=`scale(${scale})`;
+  clone.style.transformOrigin='top left';
+  wrap.appendChild(clone);
+  document.getElementById('modal-preview').classList.add('show');
+};
+document.getElementById('close-preview').onclick=()=>document.getElementById('modal-preview').classList.remove('show');
+document.getElementById('modal-preview').onclick=(e)=>{if(e.target.id==='modal-preview')e.currentTarget.classList.remove('show');};
+window.addEventListener('resize',()=>{updateCanvasScale();});
+updateFontSelectOptions();
+renderGrids();setBackground(currentBg);setSize('portrait');renderLayers();updateCanvasScale();
+</script>
+</body>
+</html>
