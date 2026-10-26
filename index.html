@@ -322,12 +322,17 @@ function renderGrids(){
   });
   const ag=document.getElementById('grid-acc');ag.innerHTML='';
   ASSETS.accessories.forEach((s,i)=>{
+const src=getSrc(s);
+const nm=getName(s,'配件'+(i+1));
+    
     const d=document.createElement('div');d.className='grid-item';
-    const img=document.createElement('img');img.src=s;
+    const img=document.createElement('img');img.src=src;
     img.onerror=()=>{img.src=makeEmptyPlaceholder(400,400,['#FECACA','#FEF3C7','#BBF7D0','#BFDBFE'][i%4]);};
-    const label=document.createElement('div');label.className='label';label.textContent='配件'+(i+1);
-    d.appendChild(img);d.appendChild(label);
-    d.onclick=()=>addImageLayer('acc',s);ag.appendChild(d);
+   
+const label=document.createElement('div');label.className='label';label.textContent=nm;
+d.appendChild(img);d.appendChild(label);
+d.onclick=()=>addImageLayer('acc',src,nm);ag.appendChild(d);
+    
   });
   const ca=document.getElementById('custom-acc');ca.innerHTML='';
   customAcc.forEach((src,i)=>{
